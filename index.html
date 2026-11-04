@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>尔文 · 工作流 SOP 地图</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --line:#e4e8f0; --text:#1c2333; --sub:#6b7280;
+    --blue:#2563eb; --green:#16a34a; --orange:#d97706; --purple:#9333ea; --red:#dc2626;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:var(--bg); color:var(--text); padding:20px 16px 60px;}
+  .wrap{max-width:1180px; margin:0 auto;}
+
+  header{background:linear-gradient(135deg,#1e293b,#334155); color:#fff; border-radius:16px; padding:20px 24px; margin-bottom:14px;}
+  header h1{font-size:21px; font-weight:700;}
+  header .sub{font-size:12.5px; color:#cbd5e1; margin-top:4px;}
+  .head-row{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-top:12px;}
+  .hbtns{display:flex; gap:8px; flex-wrap:wrap;}
+
+  .btn{border:none; border-radius:8px; padding:8px 14px; font-size:13px; cursor:pointer; font-weight:600; transition:.15s;}
+  .btn:hover{filter:brightness(1.06);}
+  .btn.primary{background:#2563eb; color:#fff;}
+  .btn.ghost{background:rgba(255,255,255,.1); color:#e2e8f0; border:1px solid rgba(255,255,255,.2);}
+  .btn.ghost:hover{background:rgba(255,255,255,.18);}
+  .btn.small{padding:4px 9px; font-size:12px; border-radius:6px;}
+  .btn.blue{background:#eff6ff; color:#1d4ed8;}
+  .btn.gray{background:#f1f5f9; color:#475569;}
+  .btn.red{background:#fef2f2; color:#b91c1c;}
+
+  .tip{background:#fffbeb; border:1px solid #fde68a; color:#92400e; border-radius:12px; padding:10px 16px; font-size:13px; margin-bottom:14px; line-height:1.7;}
+  .tip code{background:#fef3c7; border-radius:4px; padding:1px 5px; font-size:12px;}
+
+  .viewtabs{display:flex; gap:8px; margin-bottom:14px;}
+  .viewtab{flex:1; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08); border-radius:12px; padding:12px; font-size:14px; font-weight:700; cursor:pointer; color:#cbd5e1; transition:.15s; text-align:center;}
+  .viewtab:hover{background:rgba(255,255,255,.16);}
+  .viewtab.active{background:#ffffff; color:#1e293b; border-color:#ffffff; box-shadow:0 2px 10px rgba(15,23,42,.25);}
+  .viewtab.active small{color:#64748b;}
+  .viewtab small{display:block; font-weight:400; font-size:11px; color:inherit; opacity:.75; margin-top:2px;}
+
+  .chain{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:14px;}
+  .chain h3{font-size:13px; color:var(--sub); margin-bottom:10px; font-weight:600;}
+  .chain-steps{display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
+  .step{background:#f8fafc; border:1px solid var(--line); border-radius:999px; padding:6px 13px; font-size:12.5px; font-weight:600; color:#334155; display:flex; align-items:center; gap:6px;}
+  .step .n{width:20px; height:20px; border-radius:50%; color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center; font-weight:700; background:#2563eb;}
+  .step.s1 .n{background:#2563eb;} .step.s2 .n{background:#0ea5e9;} .step.s3 .n{background:#16a34a;} .step.s4 .n{background:#d97706;} .step.s5 .n{background:#9333ea;}
+  .arrow{color:#cbd5e1; font-weight:700;}
+
+  .boards{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; margin-bottom:14px;}
+  @media (max-width:900px){ .boards{grid-template-columns:1fr;} }
+  .board{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; display:flex; flex-direction:column; min-width:0;}
+  .board-head{display:flex; align-items:center; gap:8px; margin-bottom:4px;}
+  .board-dot{width:10px; height:10px; border-radius:50%;}
+  .board-title{font-size:16px; font-weight:700;}
+  .board-sub{font-size:12px; color:var(--sub); margin:2px 0 12px 18px;}
+  .board-tools{margin-left:auto; display:flex; gap:4px;}
+
+  .card{background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:grab; transition:.12s; position:relative; min-width:0;}
+  .card:active{cursor:grabbing;}
+  .card.dragging{opacity:.45; border-style:dashed;}
+  .card.drag-over{border-color:#2563eb; border-style:dashed; background:#eff6ff;}
+  .card:hover{border-color:#93c5fd; background:#f0f7ff; box-shadow:0 2px 8px rgba(37,99,235,.08);}
+  .card-top{display:flex; align-items:center; gap:6px; margin-bottom:5px;}
+  .card-name{font-weight:700; font-size:14px; padding-right:44px;}
+  .sop-line{font-size:11.5px; color:#0f766e; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:6px; padding:3px 8px; display:inline-block; margin-bottom:6px; font-weight:600;}
+  .card-desc{font-size:12.5px; color:#374151; line-height:1.6; margin-bottom:6px; white-space:pre-wrap; word-break:break-word;}
+  .card-meta{font-size:11.5px; color:var(--sub); line-height:1.7; white-space:pre-wrap; word-break:break-word;}
+  .card-meta .k{color:#94a3b8; margin-right:4px;}
+  .card .op{position:absolute; top:8px; right:8px; display:none; gap:4px;}
+  .card:hover .op{display:flex;}
+  .op .btn{padding:2px 7px; font-size:11px;}
+  .badge-row{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 4px;}
+  .mini-badge{font-size:10.5px; background:#eef2ff; color:#4338ca; border-radius:999px; padding:2px 8px; font-weight:600;}
+  .mini-badge.warn{background:#fef2f2; color:#b91c1c;}
+  .add-card{width:100%; border:1.5px dashed #cbd5e1; background:transparent; color:#64748b; border-radius:10px; padding:8px; font-size:12.5px; cursor:pointer; transition:.12s; margin-top:2px;}
+  .add-card:hover{border-color:#2563eb; color:#2563eb; background:#eff6ff;}
+
+  .card-imgs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;}
+  .img-thumb{width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line); cursor:zoom-in; transition:.12s;}
+  .img-thumb:hover{transform:scale(1.06); border-color:#93c5fd;}
+
+  .tools{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px;}
+  .tools h3{font-size:13px; color:var(--sub); margin-bottom:10px; font-weight:600;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{background:#f1f5f9; border:1px solid var(--line); border-radius:999px; padding:5px 13px; font-size:12.5px; color:#334155; cursor:pointer; transition:.12s;}
+  .chip:hover{background:#e0e7ff; border-color:#a5b4fc;}
+  .chip.add{background:transparent; border-style:dashed; color:#94a3b8;}
+  .chip.add:hover{color:#2563eb; border-color:#2563eb; background:#eff6ff;}
+
+  .map{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px;}
+  .map-intro{font-size:12.5px; color:var(--sub); margin-bottom:14px; line-height:1.6;}
+  .map-step{display:flex; gap:0;}
+  .map-node{flex:0 0 132px; display:flex; flex-direction:column; align-items:center; padding-top:14px; position:relative;}
+  .map-node .dot{width:40px; height:40px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; box-shadow:0 2px 6px rgba(0,0,0,.15);}
+  .map-node b{font-size:13px; margin-top:8px; text-align:center; color:#1e293b; line-height:1.4;}
+  .map-branch{flex:1; border-left:2px solid #dbeafe; margin:10px 0 20px; padding:2px 0 6px 16px; display:flex; flex-direction:column; gap:8px; position:relative;}
+  .map-branch::before{content:""; position:absolute; left:-2px; top:18px; width:14px; height:2px; background:#dbeafe;}
+  .map-card{background:#f8fafc; border:1px solid var(--line); border-left:3px solid var(--blue); border-radius:10px; padding:9px 12px; cursor:grab; transition:.12s; position:relative;}
+  .map-card.dragging{opacity:.45; border-style:dashed;}
+  .map-card.drag-over{border-color:#2563eb; border-style:dashed; background:#eff6ff;}
+  .map-card:hover{background:#f0f7ff; border-color:#93c5fd;}
+  .map-card .t{font-weight:700; font-size:13px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .map-card .bd-tag{font-size:10px; padding:1px 7px; border-radius:999px; color:#fff; font-weight:600;}
+  .map-card .d{font-size:12px; color:#374151; margin:4px 0 5px; line-height:1.5; white-space:pre-wrap; word-break:break-word;}
+  .map-card .m{font-size:11px; color:var(--sub); line-height:1.6; white-space:pre-wrap; word-break:break-word;}
+  .map-card .m .k{color:#94a3b8; margin-right:3px;}
+  .move-step{position:absolute; top:6px; right:6px; font-size:10px; border:1px solid #cbd5e1; border-radius:6px; padding:1px 4px; background:#fff; color:#475569; cursor:pointer;}
+  .map-empty{color:#94a3b8; font-size:12px; border:1.5px dashed #e2e8f0; border-radius:10px; padding:10px 12px; margin-left:16px;}
+  .arrow-down{margin:0 0 0 56px; color:#cbd5e1; font-weight:700; font-size:15px; height:18px; display:flex; align-items:center;}
+  .arrow-down::before{content:""; width:2px; height:14px; background:#cbd5e1; display:inline-block; margin-left:-6px; margin-right:6px;}
+  @media (max-width:700px){ .map-node{flex:0 0 84px;} .map-node b{font-size:11.5px;} }
+
+  footer{margin-top:16px; font-size:12px; color:#94a3b8; text-align:center; line-height:1.8;}
+
+  .modal{position:fixed; inset:0; background:rgba(15,23,42,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  .modal.hidden{display:none;}
+  .modal-box{background:#fff; border-radius:14px; width:100%; max-width:680px; padding:20px; box-shadow:0 20px 50px rgba(0,0,0,.2); max-height:90vh; overflow:auto;}
+  .modal-box h3{font-size:16px; margin-bottom:14px;}
+  .field{margin-bottom:11px;}
+  .field label{display:block; font-size:12px; color:#475569; font-weight:600; margin-bottom:5px;}
+  .field input,.field textarea,.field select{width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; font-size:13.5px; font-family:inherit;}
+  .field textarea{resize:vertical; min-height:52px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:11px;}
+  .row2 .field{margin-bottom:0;}
+  .img-edit{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;}
+  .img-edit-item{position:relative;}
+  .img-edit-item img{width:72px; height:72px; object-fit:cover; border-radius:8px; border:1px solid var(--line);}
+  .img-edit-item .del{position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; background:#dc2626; color:#fff; font-size:11px; line-height:18px; text-align:center; cursor:pointer; border:none;}
+  .modal-btns{display:flex; justify-content:flex-end; gap:8px; margin-top:14px;}
+
+  .sop-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding-bottom:10px; border-bottom:2px solid #e2e8f0; margin-bottom:12px;}
+  .sop-head .sop-name{font-size:16px; font-weight:700;}
+  .sop-head .timepoint{font-size:12px; color:#0f766e; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:6px; padding:3px 9px; font-weight:700;}
+  .sop-sec{margin-bottom:13px;}
+  .sop-sec h4{font-size:12.5px; color:#1e3a8a; font-weight:700; margin-bottom:6px; background:#eff6ff; border-left:3px solid #93c5fd; border-radius:6px; padding:5px 10px;}
+  .fc-red{color:#dc2626;} .fc-blue{color:#2563eb;} .fc-green{color:#16a34a;}
+  .docs-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:5px;}
+  .doc-link{display:inline-flex; align-items:center; gap:3px; font-size:11.5px; background:#f0f9ff; border:1px solid #bae6fd; color:#0369a1; border-radius:6px; padding:2px 8px; text-decoration:none; font-weight:600; word-break:break-all;}
+  .doc-link:hover{background:#e0f2fe; border-color:#7dd3fc;}
+  .doc-plain{display:inline-flex; align-items:center; gap:3px; font-size:11.5px; background:#f8fafc; border:1px solid var(--line); color:#64748b; border-radius:6px; padding:2px 8px; word-break:break-all;}
+  .fmt-bar{display:flex; flex-wrap:wrap; gap:6px; align-items:center; background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:6px 8px; margin-bottom:12px; font-size:11.5px; color:#64748b;}
+  .fmt-bar .fl{font-weight:600; color:#475569;}
+  .fmt-bar button{border:1px solid #cbd5e1; background:#fff; border-radius:6px; padding:3px 9px; font-size:12px; cursor:pointer; color:#334155; font-weight:600;}
+  .fmt-bar button:hover{border-color:#2563eb; color:#2563eb;}
+  .fmt-bar .fmt-hint{font-size:10.5px; color:#94a3b8; margin-left:auto;}
+  .sop-sec .body{font-size:12.5px; line-height:1.75; color:#374151; white-space:pre-wrap; word-break:break-word;}
+  .sop-sec .hint{font-size:11px; color:#9aa4b2; line-height:1.5; margin:-2px 0 5px;}
+  .field .hint{font-size:11px; color:#9aa4b2; line-height:1.5; margin:-2px 0 6px;}
+  .sop-tbl{width:100%; border-collapse:collapse; font-size:12px; margin-top:4px;}
+  .sop-tbl th,.sop-tbl td{border:1px solid var(--line); padding:5px 7px; text-align:left; vertical-align:top; word-break:break-word;}
+  .sop-tbl th{background:#f1f5f9; font-weight:700; color:#475569; font-size:11.5px; white-space:nowrap;}
+  .sop-tbl td.idx{width:34px; text-align:center; color:var(--sub);}
+  .sop-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:16px; padding-top:12px; border-top:1px solid var(--line);}
+  .kv{font-size:12.5px; line-height:1.8; color:#374151;}
+  .kv b{color:#475569; font-weight:600;}
+
+  .data-panel{margin-top:14px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px;}
+  #sizeWarn{margin-top:14px; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; border-radius:12px; padding:12px 16px; font-size:13px; line-height:1.7; white-space:pre-line;}
+  .sync-status{margin-top:12px; font-size:12px; color:#64748b; text-align:center; line-height:1.6;}
+  .sync-status.ok{color:#15803d;}
+  .sync-status.warn{color:#a16207;}
+  .sync-status.err{color:#b91c1c;}
+  .data-panel h3{font-size:13px; color:var(--sub); margin-bottom:8px;}
+  .data-panel textarea{width:100%; min-height:120px; font-family:ui-monospace,Consolas,monospace; font-size:12px; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:8px;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🗺️ 尔文 · 工作流 SOP 地图</h1>
+    <div class="sub">SOP 版 · 选品 → 建落地页+测款验证 → 供应链落地 → 上架销售 → 反馈闭环</div>
+    <div class="head-row">
+      <div class="viewtabs" style="margin:0; flex:1; max-width:420px;">
+        <div class="viewtab active" id="tab-cards" onclick="setView('cards')">🃏 卡片视图<small>按三大业务板块</small></div>
+        <div class="viewtab" id="tab-map" onclick="setView('map')">🧠 思维导图<small>按主链路串联</small></div>
+      </div>
+      <div class="hbtns">
+        <button class="btn ghost" onclick="pushCloud()">☁️ 上传云端</button>
+        <button class="btn ghost" onclick="pullCloud()">🔄 拉取云端</button>
+        <button class="btn ghost" onclick="setToken()">🔑 Token</button>
+        <button class="btn ghost" onclick="restoreBackup()">↩️ 恢复备份</button>
+        <button class="btn ghost" onclick="downloadData()">⬇️ 导出数据</button>
+        <button class="btn ghost" onclick="copyJSON()">📋 复制数据</button>
+        <button class="btn ghost" onclick="toggleData()">⚙️ 数据视图</button>
+        <button class="btn ghost" onclick="resetData()">↩️ 恢复默认</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="tip">
+    💡 <b>点卡片看 SOP 详情</b>；卡片右上角 ✏️ 直接编辑。<b>卡片可拖动排序</b>。文字可格式化：<code>**加粗**</code>、<code>__下划线__</code>、<code>[红]红字[/红]</code>（编辑框顶部有快捷按钮）。附件可填链接或上传文本文件。<br>☁️ <b>同步到手机</b>：先点「🔑 Token」粘贴一次 Token → 之后改完点「☁️ 上传云端」→ 手机刷新即同步。
+  </div>
+
+  <div id="view-cards">
+    <section class="chain">
+      <h3>🔗 主链路：选品到供应链的闭环（共 <span id="chainCount">5</span> 步）</h3>
+      <div class="chain-steps" id="chain"></div>
+      <div style="margin-top:10px; text-align:right;"><button class="btn small gray" onclick="editChain()">✏️ 编辑链路</button></div>
+    </section>
+
+    <section class="boards" id="boards"></section>
+
+    <section class="tools">
+      <h3>🧰 支撑工具 / 资产（跨板块共用）</h3>
+      <div class="chips" id="tools"></div>
+      <div style="margin-top:10px;"><button class="btn small gray" onclick="addTool()">＋ 添加工具</button></div>
+    </section>
+  </div>
+
+  <div id="view-map" class="hidden">
+    <section class="map">
+      <div class="map-intro">🧠 围绕主链路，把每步的 SOP 串起来。卡片右上角「↔」可把 SOP 移到其他步骤；「＋ 补充 SOP」给该步骤添加。</div>
+      <div id="mapBody"></div>
+    </section>
+  </div>
+
+  <div id="syncStatus" class="sync-status">正在连接云端…</div>
+  <footer>数据自动保存在本浏览器（localStorage，上限约 5MB）· <b>改完点「☁️ 上传云端」→ 手机/其他设备刷新即同步</b> · 上次编辑：<span id="savedAt">-</span></footer>
+  <div id="sizeWarn" class="hidden"></div>
+
+  <div class="data-panel hidden" id="dataPanel">
+    <h3>📄 数据视图（JSON，可直接改后点「应用」）</h3>
+    <textarea id="dataEditor" spellcheck="false"></textarea>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn gray" onclick="toggleData()">关闭</button>
+      <button class="btn primary" onclick="applyData()">✅ 应用数据</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="modal">
+    <div class="modal-box">
+      <h3 id="modalTitle">编辑</h3>
+      <div id="modalBody"></div>
+      <div class="modal-btns" id="modalBtns">
+        <button class="btn gray" onclick="closeModal()">取消</button>
+        <button class="btn primary" onclick="saveModal()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="f_imgfile" accept="image/*" multiple style="display:none;">
+  <input type="file" id="f_docfile" accept=".md,.txt,.csv,.json,.log,.yml,.yaml" multiple style="display:none;">
+
+</div>
+
+<script id="initialData" type="application/json">
+{
+  "meta": {
+    "owner": "尔文",
+    "updated": "2026-11-04",
+    "build": "2026-11-04-07:19"
+  },
+  "chain": [
+    "选品找品",
+    "建落地页+测款验证",
+    "供应链落地",
+    "上架销售",
+    "反馈闭环"
+  ],
+  "boards": [
+    {
+      "id": "select",
+      "name": "选品",
+      "sub": "挖掘沙特高频场景需求，验证产品并核对竞对价格带",
+      "color": "#2563eb",
+      "cards": [
+        {
+          "work": "AI 选款（含沙特需求启发日报）",
+          "timepoint": "每日 16:00（需求启发日报 15:00 自动）；挖品渠道按需维护（刷感每日限 1 小时）",
+          "purpose": "用 AI 自动挖沙特用户真实需求，产出可测款的结构化需求清单，替代凭感觉找品。 同时负责挖品渠道建设：场景 Routine 拆解 + 结构重构，44 场景×角色×流程挖品，一个流程带出一串产品，目标沉淀成场景热力图。",
+          "scope": "日常选品 / 每周新方向挖掘 / 新渠道探索 / 场景沉淀 / 周度刷感",
+          "owner": "自己（AI辅助）",
+          "partners": "—",
+          "inputs": "需求排除清单：.context/saudi-demand-exclusion-list.md\n场景罗盘：.context/saudi-scene-role-flow-compass.md\nBitable 历史记录（查重用）\n自动化配置：automation 640880e2\n场景卡片库本地源 + 9 篇飞书文档\n方法 M01：workflows/需求挖掘方法M01-从上门服务反推家庭产品.md\n方法 M02：workflows/需求挖掘方法M02-刷感意图词五维记录.md\n意图词库：workflows/刷感意图词库.md\n排除清单 + 已测产品库",
+          "steps": "读排除清单与偏好方向 | .context/saudi-demand-exclusion-list.md\n读 Bitable 历史确定本周一级领域并查重 | 飞书Bitable\n按场景罗盘定向搜索痛点 + 社媒/1688 寻品 | 场景罗盘 + WebSearch\n生成 5 条结构化需求（评分 / 寻品≥8） | scripts/saudi-demand-daily.js\n写入 Bitable 并推企微卡片 | saudi-demand-daily.js + 企微Webhook\n选本次渠道（刷社媒驯算法 / 服务团队反推 / 论坛情报） | 方法 M01 / M02\n用意图词搜索（人群×场景×情绪），不搜产品词 | 刷感意图词库.md\n追「大家吐槽同一件事」，不追火内容 | Facebook 群组 + TikTok 评论区\n按五维记录（含⑤隐性），写不出隐性视为没挖到 | 五维记录模板\n查重后沉淀进场景卡片库 / 热力图 | 场景卡片库 + push_to_feishu.js",
+          "deliverable": "Bitable 需求记录 + 企微卡片推送；场景卡片库（9 篇飞书文档 / 50 张原生表）+ 方法文档 + 机会汇总表",
+          "location": "飞书 Bitable（内部表）+ 企微群；飞书文档 + workspace-files/workflows/",
+          "handTo": "自己判断是否采纳；选品环节复用",
+          "standards": "每天 5 条需求，至少 3 条热点评分≥7\n硬排除方向一律不推\n同一方向已出 2 次不再推\n社媒寻品 / 1688 寻品各≥8 条真实可搜，1688 必须现货且链接可打开\n受众=大众刚需优先\n每张卡含：一句话描述 / 参与角色 / 流程环节 / 环节×产品机会表（含验证状态）/ 挖品重点 / 补充检查四问\n渠道覆盖高频场景（目标场景热力图）\n刷感按 M02 五维记录，⑤隐性写不出视为没挖到\n新方法用后沉淀为可复用 SOP",
+          "problems": "推了已否方向 | 没读排除清单 | 生成前必读排除清单并逐条对照\n重复推饱和方向（遮阳伞9次/不粘锅6次） | 没查重 | 先读 Bitable 历史按关键词统计\n企微中文乱码（Amazon.sa 被切） | 超 4096 字节被截断 | 用 TextEncoder 测字节，优先压缩痛点\n采纳字段被自动填 | 脚本默认值未清 | 采纳反馈/采纳日期/采纳产品名必须留空\n老搜产品词，算法只推已验证会火 | 停在舒适圈 | 改用意图词（人群×场景×情绪）\n追火的内容，没有新信息 | 火=已验证 | 只追「大家吐槽同一件事」\n只写感觉有戏 | 没逼出隐性 | ⑤写不出就继续搜，写完再记\n把延伸已测当新机会 | 概念混淆 | 延伸与新挖掘分开记\n重复踩点 | 没查重 | 先对照排除清单 + 已测库",
+          "step": 1,
+          "docs": "需求排除清单 | .context/saudi-demand-exclusion-list.md\n场景罗盘 | .context/saudi-scene-role-flow-compass.md\n场景卡片库·使用手册 | https://for-deal.feishu.cn/docx/Ik74dnMq3oOsoyxWzBWcK8Kwntb\n方法M01 服务团队反推 | workflows/需求挖掘方法M01-从上门服务反推家庭产品.md\n方法M02 刷感意图词五维 | workflows/需求挖掘方法M02-刷感意图词五维记录.md\n刷感意图词库 | workflows/刷感意图词库.md"
+        },
+        {
+          "work": "社媒选款",
+          "timepoint": "每日 15:00–16:00",
+          "purpose": "从社媒素材中找到有真实需求、且国内供应链可落地的候选品。",
+          "scope": "每日选款",
+          "owner": "自己",
+          "partners": "—",
+          "inputs": "duola-query skill（内部数据）\nvideo-understand skill（视频理解）\n需求排除清单",
+          "steps": "刷 TikTok / IG 素材，视频理解拆口播 | video-understand\n判断是真实需求还是表面爆款 | duola-query + 评论区\n找 1688 同款并核实链接可打开 | 1688\n输出选款清单 | 选款清单模板",
+          "deliverable": "选款清单：@账号 + 素材链接 / 阿语关键词 / 1688 同款可打开链接",
+          "location": "选款清单（本地 / 飞书）",
+          "handTo": "自己推进测款验证",
+          "standards": "每条有真实素材来源（@账号 + 链接）\n带阿拉伯语关键词\n1688 有可落地同款，链接真实可打开",
+          "problems": "只看到表面爆款 | 没验证真实需求 | 进评论区看吐槽与追问\n素材与供应链不匹配 | 用了打不开的链接 | 只保留真实可打开的 1688 链接",
+          "step": 1,
+          "docs": ""
+        },
+        {
+          "work": "测款验证（含建落地页）",
+          "timepoint": "每日 10:15 选款；测试 100 美金 / 5 天",
+          "purpose": "用最低成本验证产品是否真有市场，决定是否推进落地。",
+          "scope": "新品推进前的前置市场验证",
+          "owner": "自己",
+          "partners": "推广组",
+          "inputs": "测款表（内部表）\n第三方免责独立站落地页\n核心卖点（参考口播）+ 定价\n视频素材（社媒现成 / 视频 AI 生成）",
+          "steps": "建第三方免责独立站落地页（卖点/场景/定价） | 独立站\n准备核心卖点口播 + 定价 + 视频素材 | 社媒素材 / 视频AI\n交推广剪辑并在 TikTok 投放 100 美金/5 天 | 推广组\n记录订单数 / 点击率 / ROI 并定级 | 测款表",
+          "deliverable": "测款表记录（品名 / 是否达标 / 测款数据 / 测成时间 / 等级）",
+          "location": "东来-需求测试表（内部表）",
+          "handTo": "推广组 + 自己复盘",
+          "standards": "ROI＞1.8（订单数×客单价SAR×0.27×12%÷100美金）\n测款期间订单数量、落地页点击率达标\n备货量定级：B<1000 / A 1000-2000 / S 2000-5000 / S+≥5000\n多规格时默认最贵/最多，让用户主动选便宜的",
+          "problems": "测款数据三行读错 | 不熟格式 | 按 $花费 / %点击率 / xx单 三行读\n测成时间归属错 | 没看跟进用表 | 以跟进用表的测成时间列为准\n落地页不是第三方免责站 | 图省事 | 必须独立站 + 免责\n定价失真导致结论不可信 | 价格敏感判断错 | 参考历史（丸子机 129SAR 能出单）\n测款结论不置信 | 素材是 A 却默认 B 规格 | 多规格默认最贵/最多，便宜的让用户主动选",
+          "step": 2,
+          "docs": "测款表 | 内部表：东来-需求测试表\n测款落地页搭建（Shoplazza） | https://homehome.myshoplaza.com/admin/smart_apps/statistics/overview"
+        },
+        {
+          "work": "沙特电话调研（市场验证）",
+          "timepoint": "测款成功后按需（功能 / 场景 / 价格需进一步确认时）",
+          "purpose": "用本地真实用户验证产品功能、使用场景与价格接受度，把不确定的地方在落地前问清楚。",
+          "scope": "测款成功但功能细节 / 使用场景 / 定价仍不确定时",
+          "owner": "自己",
+          "partners": "本地客服团队（执行电话）、组长",
+          "inputs": "沙特电话调研 Skill 使用指南\nShiga survey 企微协作表（填需求与问题）\n待验证问题清单（功能 / 场景 / 价格 / 痛点优先级）\n测款数据与用户评论（问题来源）",
+          "steps": "列出必须验证的问题（每个问题对应一个决策） | Skill 指南\n在 Shiga survey 填需求与问卷问题 | 企微协作表\n把协作表发给本地客服团队执行电话调研 | 企微\n回收结果写成结论，回填需求任务卡（规格 / 定价） | 调研结果 + 任务卡",
+          "deliverable": "调研结论（功能优先级 / 真实使用场景 / 价格接受区间）+ 已回填的需求任务卡",
+          "location": "Shiga survey + 需求任务卡",
+          "handTo": "自己 → 供应链落地",
+          "standards": "每个问题都能落到一个决策（改规格 / 改定价 / 放弃）\n样本覆盖目标人群（不只一类用户）\n结论必须回填到需求任务卡，不停留在报告\n有不确定就标未知，不编造",
+          "problems": "问题太宽泛得不出结论 | 问卷设计不聚焦 | 一题对应一个决策\n样本偏差 | 只找一类用户 | 按目标人群分层抽样\n调研完没落地 | 只写报告不回填 | 结论必须转成规格或定价",
+          "docs": "沙特电话调研 Skill 使用指南 | https://for-deal.feishu.cn/docx/NI9LdnmLfoKzRRx86gxcPTSmnWg\nShiga survey 企微协作表 | https://doc.weixin.qq.com/sheet/e3_AagARwaRAOEvP1rp96DQR6ilsIFMm?scode=AFEACAfVAA07kPEw1cAdAAigYRALY&tab=lzl2ma",
+          "step": 2
+        },
+        {
+          "work": "北极星对标（竞对价格带）",
+          "timepoint": "每周（周报固定一趴）；新品类立项前",
+          "purpose": "搞清楚竞对的价格档位与产品结构，知道我们要打谁、哪些能省、哪些不能省。",
+          "scope": "新品类评估 / 定价决策 / 周报竞对分析",
+          "owner": "自己",
+          "partners": "上级（模板）、辉哥（成本对标）",
+          "inputs": "竞对店铺与账号（本地大店与小店）\n竞对售价与产品结构\n竞对样品（已采购）\n我们的目标成本与售价",
+          "steps": "选定对标对象（大店如 Lc / 小店杂物店） | IG / TikTok / 线下信息\n拉价格带与品类结构（哪些品牌贵、哪些我们打得过） | 竞对清单\n拆竞对产品成本构成，列可省 / 不可省清单 | 样品 + 辉哥\n定策略：贵款用性价比打（如 1/3 价格），便宜款不强拼 | 定价表",
+          "deliverable": "北极星对标表（竞对 / 价格带 / 产品结构 / 可省项 / 目标定价）",
+          "location": "周报 + 定价表",
+          "handTo": "自己定价决策 → 供应链",
+          "standards": "对标对象明确（大店与小店分开）\n价格带与我们的成本能对得上\n明确写出哪些成本能省、哪些不能省\n结论能直接指导定价或放弃决策",
+          "problems": "只知道竞对卖多少钱 | 没看价格在批发市场的档位 | 拉完整价格带\n跟便宜货硬拼 | 没算采购极限成本 | 改打他们贵的款\n对标小店却按大店标准做 | 人群错位 | 分清渠道与人群\n结论不落地 | 只描述不决策 | 每条给做 / 不做 / 怎么做",
+          "docs": "",
+          "step": 2
+        }
+      ]
+    },
+    {
+      "id": "supply",
+      "name": "推动供应链落地",
+      "sub": "需求给到位、时效压住、材质成本可控、失败品可回捞",
+      "color": "#16a34a",
+      "cards": [
+        {
+          "work": "测款→交接供应链",
+          "timepoint": "测成即填卡；每日 14:00 跟进",
+          "purpose": "把测成品的需求给到可落地的颗粒度，并盯住 30 天内出货。",
+          "scope": "测款成功、决定推进落地",
+          "owner": "自己",
+          "partners": "供应链同事（SC）",
+          "inputs": "需求任务卡模板：workflows/20260902_买手执行手册-需求任务卡.md\n东来-需求测试表（跟进用）测成时间列\n竞对信息（友商 SR / 链接 / 差评）",
+          "steps": "用 AI 生成任务卡四段（场景/款型/竞对/落地要求） | 手册提示词\n逐项填硬字段（友商SR/链接/参考成本/长宽高/材质） | 产品全生命周期主表\n申请落地并交接 SC，群内留痕 | 产品群\n每日按 todo 跟进，超时即问原因（拆流程核时效） | 落地表 + AI todo 机器人\n两份复核：一审 AI、一审 SC | AI + SC 对话",
+          "deliverable": "需求任务卡（四段 + 硬字段）+ 交接记录 + 时效复核结论",
+          "location": "产品全生命周期主表 + 产品群",
+          "handTo": "供应链 SC",
+          "standards": "测成当天完成任务卡 + 交接，无积压\n四段齐全、写事实不写文案\n硬字段全填：友商SR / 友商链接 / 参考成本rmb / 长宽高cm / 产品材质\n数字精确（元/SAR/cm/克），未知标「未知：需补充」\n满足功能卖点 + 测款目标售价\n30 天内出货",
+          "problems": "先申请后补卡被打回 | 顺序反了 | 先填卡再申请落地\n把文案当事实 | 写卖点不写事实 | 写「薄壁塑料不行」这类可核验事实\n自己编数字 | 不想写未知 | 标「未知：需补充」，由 SC 补\n二次确认拖多轮 | 没一次答完 | 一轮答完，企微文字留痕\n超时没人问 | 不敢问 / 怕留痕 | 产品群直接问，群消息即留痕\n时效超过 30 天 | 没拆流程 | 让 SC 拆环节（包装/入库/打包能否并行），再谈下一批压缩",
+          "step": 3,
+          "docs": "需求任务卡执行手册 | workflows/20260902_买手执行手册-需求任务卡.md\nCase_01 产品档案（标准样例） | https://for-deal.feishu.cn/drive/folder/HciofBO3slHLd7ddmD8cbfS1njb\n线上零售供应链落地表（交接 / 复核 / AI满意度） | https://for-deal.sg.larksuite.com/wiki/LxhiwpKPWigPyykLG9vlVulkgPe?table=tblPrbj6VX0TogZk&view=vewRSu0cAE"
+        },
+        {
+          "work": "时效复核与催货",
+          "timepoint": "每日 14:00 跟进；到仓前后复核",
+          "purpose": "把 30 天出货从口号变成可拆解、可复核、可压缩的流程，避免钱压在路上错过销售窗口。",
+          "scope": "大货生产 / 发货 / 到仓全流程",
+          "owner": "自己",
+          "partners": "供应链 SC、易安（货代）、仓库",
+          "inputs": "落地表时效数据（下单 / 打样 / 生产 / 发货 / 到仓）\nSC 提供的环节耗时说明\n海运正常时效基准（约 30 天）",
+          "steps": "拆环节核时效：包装 / 入库 / 打包哪些能并行 | 落地表\n两方复核：先跟 AI 核合理性，再跟 SC 核真实原因 | AI + SC\n超 30 天就问下一批能否压缩（第一批打模、第二批省掉） | SC 谈判\n按类型催货：爆款缺货 / 新款未测快催，慢销有库存不催 | 易安 + 仓库\n发货后查 delay 根因（提货晚 / 途中 / 清关超期） | 易安清关记录",
+          "deliverable": "时效复核结论 + 催货优先级清单 + delay 原因记录",
+          "location": "落地表 + 产品群",
+          "handTo": "SC / 易安 / 仓库",
+          "standards": "每个环节都有明确天数与依据\n30 天内出货；超期的有原因与压缩方案\n催货有分类依据（不是所有都催）\ndelay 必须定位到具体环节",
+          "problems": "只跟着不催 | 没人 push 就拖 | 按爆款 / 新款优先催\n接受就是要 30 天 | 没拆环节 | 拆到工序级找并行机会\n所有货都催 | 没优先级 | 慢销 / 有库存的不催，省仓储费\n清关异常不追 | 默认正常 | 清关 1-2 天变十几天要查原因",
+          "docs": "线上零售供应链落地表（时效 / 状态） | https://for-deal.sg.larksuite.com/wiki/LxhiwpKPWigPyykLG9vlVulkgPe?table=tblPrbj6VX0TogZk&view=vewRSu0cAE",
+          "step": 3
+        },
+        {
+          "work": "商详设计需求",
+          "timepoint": "每日 15:00",
+          "purpose": "让商详准确表达卖点、与测款素材一致，并按时上架。",
+          "scope": "今日上品 / 商详改造",
+          "owner": "自己",
+          "partners": "设计",
+          "inputs": "设计需求单\n卖点（与测款素材一致）\nfreeme-topview-pack（生图，可选）",
+          "steps": "写设计需求单（产品/卖点/图位/阿语文案） | 需求单模板\n提主图 1:1 与商详 3:4 需求 | 设计\n审核产出（与实物、测款卖点一致） | 自己\n同步售价上架公司 app | 上架后台",
+          "deliverable": "设计需求单 + 最终主图商详",
+          "location": "设计需求单（飞书 / 本地）+ 上架后台",
+          "handTo": "设计 + 上架",
+          "standards": "主图 1:1 + 商详 3:4（含阿语卖点）\n卖点与测款素材一致\n审核通过后再同步上架 app",
+          "problems": "产出与实物不符 | 需求描述不到位 | 需求单附参考图与规格数字\n阿语文案错误 | 机翻未校对 | 阿语人工核对\n反复返工 | 需求不明确 | 一次写清图位、文案、卖点顺序",
+          "step": 4,
+          "docs": "设计需求单 | 设计需求单（飞书/本地）\n商品库（上传商详 / 看评价） | https://galaxy.duolainc.com/#/select/selectitem/list?itemId=40857033&sortField=succCheck_7&status=1&stockRegion=SA&needc2=false&adsInfo=false&priceAppId=0&grossCountry=SA&brandEntityTags=arrayValue999999999&allItem=false&brandTag=arrayValue999999999\n供应链落地表（商详协作 / 卖点检查） | https://for-deal.sg.larksuite.com/wiki/LxhiwpKPWigPyykLG9vlVulkgPe?table=tblPrbj6VX0TogZk&view=vewRSu0cAE\n代运营平台（上架 / LOGO / 改价） | https://cn-domai.duolainc.com/#/self/goods/list"
+        },
+        {
+          "work": "材质与成本认知（能力建设）",
+          "timepoint": "持续（每次核价 / 谈判 / 看样时积累）",
+          "purpose": "补齐材质、工艺与成本判断力，能自己判断「哪些能省、哪些不能省」，不被动接受供应商报价。",
+          "scope": "新品类评估 / 成本谈判 / 样品判断",
+          "owner": "自己",
+          "partners": "辉哥（工艺判断）、供应链（询价）",
+          "inputs": "材质知识（不锈钢 401 / 201 / 304 的差异与场景）\n成本结构（材料 / 工艺 / 包装 / 运费档位）\n供应商报价与样品\n盐雾测试等标准验证手段",
+          "steps": "先判断材质适用场景（401 易锈 / 201 日常够用 / 304 高端） | 材质对照表\n拆成本结构：材料 + 人工工序 + 包装 + 运费档位 | 成本拆解表\n用标准方法验证（如 410 / 304 做盐雾测试，不手工醋泡） | 供应商检测设备\n找供应商资源时让其引荐同行圈子（比 1688 大海捞针有效） | 供应商引荐\n模具与工艺先问辉哥再让供应商动手，避免二次返工 | 辉哥评审",
+          "deliverable": "成本拆解表 + 材质判断结论 + 可复用供应商/工艺笔记",
+          "location": "records.json + 供应商笔记",
+          "handTo": "自己复用 → 定价与议价",
+          "standards": "每款能说清材质档次与适用人群\n成本拆解到工序级（材料 / 人工 / 包装 / 运费）\n验证用标准方法，结论可复核\n不因便宜而降质量红线（如刀具硬度与防锈）",
+          "problems": "用 401 冒充好钢 | 不了解材质差异 | 按场景选材质，食品接触避 401\n成本只抄 1688 页面价 | 没拆工序 | 逐项拆解并谈判\n模具费被按大产量虚报 | 供应商按自己预估量报价 | 按真实年用量（如 5 万）开模并谈\n手工测试结论不可信 | 方法不标准 | 用盐雾测试等标准手段",
+          "docs": "",
+          "step": 3
+        },
+        {
+          "work": "失败品回捞（落地失败重新评估）",
+          "timepoint": "按需（双周会指定 DDL，如 11/4 盘完）",
+          "purpose": "把过去落地失败的产品重新核一轮成本与可行性，捞回仍有希望的方向，不让已投入的工作白费。",
+          "scope": "落地失败品复盘 / 双周会专项",
+          "owner": "自己",
+          "partners": "辉哥（核成本现实性）、供应链",
+          "inputs": "落地失败品清单（含历史成本与失败原因）\n辉哥核价口径（按河北等产地成本核算）\n竞对价格带参考\n已测产品库（避免重复）",
+          "steps": "拉全量落地失败品清单并补齐缺失信息 | 落地表 + 历史记录\n自己先核一轮成本与可行性（误差 ≤20%） | Excel + records.json\n先给辉哥看「现不现实」，不把离谱需求推回供应链 | 辉哥确认\n能落的按新成本重估并在双周会同步 | 双周会",
+          "deliverable": "回捞候选清单（品名 / 失败原因 / 新成本估算 / 可行结论 / 建议动作）",
+          "location": "落地表 + workflows/",
+          "handTo": "辉哥确认 → 供应链跟进",
+          "standards": "每条都有明确结论（可回捞 / 放弃）\n成本误差 ≤20%（超出说明信息不全）\n先经辉哥判断现实性再谈推进\n不重复推已被否的方向",
+          "problems": "把离谱需求重新推给供应链 | 没先自查成本 | 先自己核一轮再找辉哥\n回捞信息缺失 | 历史记录不全 | 补齐成本与失败原因再评估\n重复捞已否方向 | 没查重 | 对照排除清单与已测库",
+          "docs": "",
+          "step": 3
+        }
+      ]
+    },
+    {
+      "id": "monitor",
+      "name": "监测产品销售",
+      "sub": "数据复盘、满意度回收、售价调整与向上汇报",
+      "color": "#d97706",
+      "cards": [
+        {
+          "work": "每日复盘（含测款数据复盘+产品延伸）",
+          "timepoint": "每日 18:15（产品复盘按需）",
+          "purpose": "当天收口：把测款数据变成结论，定出明日优先，不把问题带到第二天。",
+          "scope": "每日收工前 / 满意度回收 / S+/S/A 延伸分析",
+          "owner": "自己",
+          "partners": "供应链同事（满意度回收）",
+          "inputs": "当日测款数据\n.context/daily-reviews.md\n飞书 Bitable（内部表）\n.context/note.md（产品深度分析）",
+          "steps": "只回差异（不逐项报） | 企微\n复盘测款数据并给结论（达标/重测/提价） | 测款表\n写复盘文档并同步 Bitable | daily-reviews.md\n定期做 S+/S/A 延伸分析与满意度回收 | note.md",
+          "deliverable": "daily-reviews.md（完成率 + 各项一句结论 + 卡点 + 明日优先）",
+          "location": ".context/daily-reviews.md + 飞书 Bitable",
+          "handTo": "次日日程 + 周报素材",
+          "standards": "完成率与任务序号一一对应（如 6/8）\n只回差异，不逐项追\n每个测款品有明确结论并记录价格敏感度\n产品复盘含场景需求 / 人群 / 延伸方向表\n满意度反馈回收后才滚动备货",
+          "problems": "中断未收尾 | 被打断没回来 | 18:15 一次性做完，不留尾巴\n字段格式乱 | 没分点、没换行 | 分点 + 单元格内换行\n测款三行读错 | 格式不熟 | 按 $花费 / %点击率 / xx单\n分析泛泛不谈 | 没落到可搜关键词 | 每条给 TikTok + 1688 关键词",
+          "step": 5,
+          "docs": "每日复盘记录 | .context/daily-reviews.md\n产品深度分析 | .context/note.md\n开阳星看板（家电/户外销售数据） | http://redash.duolainc.com/dashboard/2794?_params=4fb0b12ff73ab288c9b139bb0faf966b&tab=58def760-a9e4-4646-9762-c84747441bae\n启明星看板（家居销售数据） | https://redash.duolainc.com/dashboard/2797?_params=f1ca3616e7e65c1187509788a46bb88c&tab=75d43ba8-3ce0-47d4-b350-ac40514dfe55"
+        },
+        {
+          "work": "需求日会",
+          "timepoint": "每日 18:00",
+          "purpose": "同步选品、测款结果与卡点，形成可执行的关键决策。",
+          "scope": "每日团队日会",
+          "owner": "自己",
+          "partners": "团队 / 组长",
+          "inputs": "当日测款结果\n卡点清单\n需要拍板的事项",
+          "steps": "准备当日数据与卡点 | 测款表\n会上同步并记录关键决策 | 会议记录\n归档逐字稿 / 发言总结 | 飞书",
+          "deliverable": "日会逐字稿 / 发言总结（含关键决策）",
+          "location": "飞书（日会记录）",
+          "handTo": "团队 + 周报素材",
+          "standards": "逐字稿保留关键决策（关闭哪些广告 / 新开什么渠道 / 定价调整）\n卡点必须落到「谁在什么时候解决」",
+          "problems": "不记录导致周报无素材 | 没有归档习惯 | 会后立即存逐字稿\n决策没留痕 | 只在口头 | 关键决策当场写入记录",
+          "step": 5,
+          "docs": ""
+        },
+        {
+          "work": "尔文周报",
+          "timepoint": "每周",
+          "purpose": "用数据复盘一周，按组内新格式汇报：拓新计划 / 进展 / 满意度与北极星对标。",
+          "scope": "每周向上汇报",
+          "owner": "自己",
+          "partners": "上级",
+          "inputs": "东来-需求测试表（新 + 跟进用）\n本周日会记录\n落地与满意度数据\n罗盘格子打卡与测成率\n北极星对标资料",
+          "steps": "汇总本周与上周数据（含测款总数、测成率） | Excel\n写拓新计划：下周攻克方向（场景 / 品类）与拟测产品（功能 + 人群） | 周报模板\n写进展：罗盘格子打卡数与成功率 + 测成品 + 供应链各状态 | 落地表\n写满意度与北极星对标，生成飞书文档并转所有权 | 飞书 API",
+          "deliverable": "飞书周报文档（带边框表格）+ 所有权转移给尔文",
+          "location": "飞书云盘「尔文周报」文件夹",
+          "handTo": "上级",
+          "standards": "三部分齐全：拓新计划 / 进展 / 满意度与对标\n含测款总数、测成率、罗盘格子数据\n供应链进展按状态分组（拿样 / 改样 / 本地采 / 大货 / 发货 / 到仓 / 销售 / 满意度）\n达标品只列本周测成，上周放落地跟进\n摘要 ≤200 字",
+          "problems": "进度只写在推进 | 颗粒度不够 | 按状态列到具体环节与天数\n罗盘数据缺失 | 没记打卡 | 每周记录格子与成功率\n对标结论不落地 | 只描述竞对 | 每条给定价或取舍结论\n重复建文档 | 每次新建 | 先查旧文档在原文档追加",
+          "step": 5,
+          "docs": "周报 SOP | .context/erwin-weekly-report-sop.md"
+        },
+        {
+          "work": "满意度回收与滚动备货",
+          "timepoint": "每日 / 每周跟进；批次到仓后重点看",
+          "purpose": "把售后满意度变成下一步动作（V2 改造、素材修正、停返单），避免错判继续压货。",
+          "scope": "已售产品销售期 / 返单决策",
+          "owner": "自己",
+          "partners": "供应链（满意度收集）、投放（素材）",
+          "inputs": "满意度数据（分批次 / 颜色 / 规格）\n售后与差评内容\n投放素材与落地页\n售卖数据（日均单量、库存、在途）",
+          "steps": "主动催满意度（不等供应链发），按批次记录 | Bitable / 群\n判原因：产品问题 / 素材误导 / 预期差 | 差评与素材比对\n给动作：V2 改造、改素材、换落地页、或停返单 | 决策记录\n按销量与在途定滚动备货节奏（缺货涨价而非清货） | 备货表",
+          "deliverable": "满意度结论 + 改进动作清单 + 返单 / 停单决策",
+          "location": "Bitable + 落地表",
+          "handTo": "供应链 / 投放 / 自己",
+          "standards": "满意度低于 85% 必须分析原因并给动作\n素材误导类先改素材与落地页，不盲目改产品\n返单决策有数据依据（日均单量 + 在途 + 库存）\n季节性产品尾季不追货",
+          "problems": "满意度没人催 | 被动等供应链 | 主动催，早出结论早决策\n只改产品不改素材 | 没区分原因 | 先判断是产品问题还是预期问题\n卖不动还继续返单 | 没看日均与在途 | 按数据决定停 / 减\n尾部季节硬追货 | 怕缺货 | 宁可涨价卖，不追尾季柜",
+          "docs": "开阳星看板（家电/户外：利润·卖完·物流） | http://redash.duolainc.com/dashboard/2794?_params=4fb0b12ff73ab288c9b139bb0faf966b&tab=58def760-a9e4-4646-9762-c84747441bae\n启明星看板（家居：利润·卖完·物流） | https://redash.duolainc.com/dashboard/2797?_params=f1ca3616e7e65c1187509788a46bb88c&tab=75d43ba8-3ce0-47d4-b350-ac40514dfe55\n商品库（看评价 / 差评） | https://galaxy.duolainc.com/#/select/selectitem/list?itemId=40857033&sortField=succCheck_7&status=1&stockRegion=SA&needc2=false&adsInfo=false&priceAppId=0&grossCountry=SA&brandEntityTags=arrayValue999999999&allItem=false&brandTag=arrayValue999999999\n供应链落地表（AI满意度调研协作） | https://for-deal.sg.larksuite.com/wiki/LxhiwpKPWigPyykLG9vlVulkgPe?table=tblPrbj6VX0TogZk&view=vewRSu0cAE",
+          "step": 5
+        },
+        {
+          "work": "定价回溯 / AI定价对比",
+          "timepoint": "按需（测款前后）",
+          "purpose": "校准目标售价与采购成本，避免漏算成本导致定价失真、测款白做。",
+          "scope": "测款前后定价 / 落地成本复核",
+          "owner": "自己",
+          "partners": "供应链（询价）",
+          "inputs": "records.json（历史记录）\n1688 链接与询价结果\n定价回溯_尔文.md、Layer1_定价回溯_尔文.xlsx\nAI 估价结果",
+          "steps": "1688 询价并谈判采购价 | 1688 / 供应商\n拆成本：采购 + 包装防护 + 运费档位 | records.json\n与 AI 估价对比，定目标售价（尾数 9 取大） | AI + 定价表\n记录留档 | records.json",
+          "deliverable": "records.json 每行：品名 / 1688链接 / 成本拆解 / 包装箱规 / 运费档位 / 估价方式 / 备注",
+          "location": "workspace-files/records.json + 定价回溯文档",
+          "handTo": "自己 + 供应链做成本约束",
+          "standards": "每款必拆采购 + 包装 + 运费 + AI 对比\n定价尾数 9 取大\n成本误差控制 ≤20%（超出说明信息不全，需补证）",
+          "problems": "直接采用 1688 页面价 | 没询价谈价 | 12层干果机 265 元未询价直接采用的教训\n包装防护漏算 | 未按跨境落摔标准 | 包装成本按落摔要求计入\n无现货 / 链接打不开 | 未核实 | Bakhoor 礼盒教训\n箱规大、物流重 | 没算运费档位 | 一次性聚会餐具 89SAR 不现实的教训",
+          "step": 2,
+          "docs": "records.json | records.json\n定价回溯文档 | 定价回溯_尔文.md\nFordeal-LEGO（产品改价） | https://lego.duolainc.com/#/marketing/goods?nodeId=124\n代运营平台（改价 / 上下架） | https://cn-domai.duolainc.com/#/self/goods/list"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    "飞书（文档/Bitable/测款表）",
+    "企业微信推送",
+    "Topview AI 生图/视频",
+    "duola-query 内部API",
+    "视频理解 / ASR 转写",
+    "东来-需求测试表（新+跟进用）",
+    "场景罗盘",
+    "需求排除清单",
+    "第三方免责独立站（落地页）",
+    "Excel 数据处理脚本",
+    "竞对样品与价格带资料",
+    "盐雾测试等标准检测（供应商）",
+    "周转与在途库存数据"
+  ]
+}
+</script>
+<script>
+(function(){
+  var LS_KEY = 'erwen-workflow-map-v7';
+  var OLD_KEY = 'erwen-workflow-map-v5';
+  var LS_SAVED_AT = 'erwen-wf-saved-at';
+  var LS_PUSHED_AT = 'erwen-wf-pushed-at';
+  var LS_TOKEN = 'erwen-wf-gh-token';
+  var GH = { owner: 'taytayandmingle13', repo: 'workflow-map', branch: 'main', path: 'data.json' };
+  var bootDone = false;
+  var lastPayload = null;
+  var DEFAULT = JSON.parse(document.getElementById('initialData').textContent);
+  var state = null;
+  var currentView = 'cards';
+  var STEP_COLORS = ['#2563eb','#0ea5e9','#16a34a','#d97706','#9333ea'];
+  var HINTS = {
+    timepoint: '这个 SOP 在什么时间点执行（如：每日 10:15 ／ 每周五 ／ 按需）',
+    purpose: '这项工作为了解决什么问题，一句话',
+    scope: '什么情况下用、谁负责（写清负责人和协作方）',
+    inputs: '开始前需要准备什么：资料、工具、模板、权限',
+    steps: '按顺序做什么，每步一个动作、以动词开头；格式：动作 | 工具/模板/文件',
+    deliverable: '做完交付什么（文件名、存放位置、交给谁）',
+    standards: '怎样算合格：用数字或「是/否」判断，一行一条',
+    problems: '踩过的坑和应对方法，来自真实经验最有价值；格式：问题 | 原因 | 处理方法',
+    docs: '可直接粘贴链接（自动命名）→ 点「＊ 添加链接」；一行一个格式：名称 | 链接；本机文本文件可点下方按钮上传'
+  };
+  var pendingImgs = [];
+  var imgFileEl = document.getElementById('f_imgfile');
+
+  function parseSteps(txt){
+    return String(txt||'').split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(l){
+      var p = l.split(/\s*[|｜]\s*/);
+      if(p.length >= 2) return {a:p[0], t:p.slice(1).join(' | ')};
+      var m = l.split(/\s*——\s*/);
+      if(m.length >= 2) return {a:m[0], t:m.slice(1).join(' —— ')};
+      return {a:l, t:''};
+    });
+  }
+  function parseProblems(txt){
+    return String(txt||'').split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(l){
+      var p = l.split(/\s*[|｜]\s*/);
+      return {q:p[0]||'', c:p[1]||'', f:p[2]||''};
+    });
+  }
+
+  function migrate(old){
+    try{
+      var out = {meta: old.meta || DEFAULT.meta, chain: old.chain || DEFAULT.chain, boards: [], tools: old.tools || DEFAULT.tools};
+      (old.boards||[]).forEach(function(b){
+        var nb = {id:b.id, name:b.name, sub:b.sub, color:b.color, cards:[]};
+        (b.cards||[]).forEach(function(c){
+          var ps = parseProblems(c.risks || '');
+          nb.cards.push({
+            work: c.work || '',
+            timepoint: c.trigger || '',
+            purpose: c.desc || '',
+            scope: '', owner: c.contact || '', partners: '',
+            inputs: c.files || '',
+            steps: '',
+            deliverable: c.output || '', location: '', handTo: '',
+            standards: c.standard || '',
+            problems: ps.map(function(x){ return [x.q, x.c, x.f].filter(Boolean).join(' | '); }).join('\n'),
+            step: c.step || 0
+          });
+        });
+        out.boards.push(nb);
+      });
+      return out;
+    }catch(e){ return null; }
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      if(raw){
+        var p = JSON.parse(raw);
+        var wantBuild = (DEFAULT.meta && DEFAULT.meta.build) || '';
+        var haveBuild = (p.meta && p.meta.build) || '';
+        if(wantBuild && haveBuild !== wantBuild){
+          /* 文件已更新：先备份旧数据，再用新版 */
+          try{
+            localStorage.setItem('erwen-wf-backup', raw);
+            localStorage.setItem('erwen-wf-backup-at', String(Date.now()));
+          }catch(e){}
+          setTimeout(function(){ setSync('✅ 已更新到新版（原本机数据已备份，可点「↩️ 恢复备份」找回）', 'ok'); }, 300);
+          return stripImgs(JSON.parse(JSON.stringify(DEFAULT)));
+        }
+        if(p && p.boards && p.chain) return stripImgs(p);
+      }
+      var oldRaw = localStorage.getItem(OLD_KEY);
+      if(oldRaw){ var mp = migrate(JSON.parse(oldRaw)); if(mp) return stripImgs(mp); }
+    }catch(e){}
+    return JSON.parse(JSON.stringify(DEFAULT));
+  }
+  function save(){
+    var payload = JSON.stringify(state);
+    /* 自动快照：数据一变，先把上一版存起来，任何意外覆盖都可回退 */
+    if(bootDone && lastPayload && payload !== lastPayload){
+      try{ localStorage.setItem('erwen-wf-snap', lastPayload); localStorage.setItem('erwen-wf-snap-at', String(Date.now())); }catch(e){}
+    }
+    lastPayload = payload;
+    var mb = payload.length / 1024 / 1024;
+    var stored = true;
+    try{ localStorage.setItem(LS_KEY, payload); }catch(e){ stored = false; }
+    if(bootDone){ try{ localStorage.setItem(LS_SAVED_AT, String(Date.now())); }catch(e){} }
+    var warnEl = document.getElementById('sizeWarn');
+    if(!stored || mb > 3.5){
+      if(warnEl){
+        warnEl.classList.remove('hidden');
+        warnEl.innerHTML = (stored ? '⚠️ ' : '❗ ') + '当前数据约 ' + mb.toFixed(1) + 'MB' + (stored ? '（浏览器上限约 5MB，接近上限可能保存失败）' : '，已超出浏览器存储上限，本次未能保存！') + '\n请尽快点「📋 复制数据」发给我归档，或点「⬇️ 导出数据」下载备份。';
+      }
+    } else if(warnEl){ warnEl.classList.add('hidden'); }
+    var now = new Date();
+    document.getElementById('savedAt').textContent = now.getMonth()+1 + '月' + now.getDate() + '日 ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + (stored ? '' : ' · 未保存');
+  }
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function rich(txt){
+    var s = esc(txt);
+    s = s.replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>');
+    s = s.replace(/__([^_\n]+)__/g, '<u>$1</u>');
+    s = s.replace(/\[红\]([\s\S]*?)\[\/红\]/g, '<span class="fc-red">$1</span>');
+    s = s.replace(/\[蓝\]([\s\S]*?)\[\/蓝\]/g, '<span class="fc-blue">$1</span>');
+    s = s.replace(/\[绿\]([\s\S]*?)\[\/绿\]/g, '<span class="fc-green">$1</span>');
+    return s;
+  }
+  function safeUrl(u){
+    var s = String(u||'').trim();
+    if(/^https?:\/\//i.test(s)) return s;
+    if(/^data:text\/plain/i.test(s)) return s;
+    return '';
+  }
+  function guessName(url){
+    try{
+      var u = new URL(url);
+      var host = u.hostname.replace(/^www\./,'');
+      var seg = decodeURIComponent((u.pathname||'').split('/').filter(Boolean).pop() || '');
+      seg = seg.replace(/\.[a-z0-9]{2,5}$/i,'');
+      return seg ? (host + ' · ' + seg.slice(0,28)) : host;
+    }catch(e){ return String(url||'').slice(0,36); }
+  }
+  function parseDocs(txt){
+    return String(txt||'').split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(l){
+      var name = '', url = '';
+      var parts = l.split(/\s*[|｜]\s*/);
+      if(parts.length >= 2){
+        var rest = parts.slice(1).join('|');
+        var m = rest.match(/https?:\/\/[^\s|]+/i) || rest.match(/data:text\/plain[^\s|]+/i);
+        name = parts[0].trim();
+        url = m ? m[0] : '';
+      } else {
+        var m2 = l.match(/https?:\/\/[^\s|]+/i) || l.match(/data:text\/plain[^\s|]+/i);
+        if(m2){
+          url = m2[0];
+          name = l.replace(url, '').replace(/^[\s|｜:：\-–—]+/,'').replace(/[\s|｜:：\-–—]+$/,'').trim();
+        } else { name = l; }        
+      }
+      url = safeUrl(url);
+      if(url && !name) name = guessName(url);
+      return {name: name, url: url};
+    });
+  }
+  function docsHTML(c){
+    var ds = parseDocs(c.docs);
+    if(!ds.length) return '';
+    var h = '<div class="docs-list">';
+    ds.forEach(function(d){
+      if(d.url && /^data:/i.test(d.url)){
+        h += '<span class="doc-link" data-name="'+esc(d.name)+'" data-url="'+esc(d.url)+'" onclick="event.stopPropagation();openDoc(this)" title="点击预览文件">📄 '+esc(d.name)+'</span>';
+      } else if(d.url && /^https?:/i.test(d.url)){
+        h += '<a class="doc-link" href="'+esc(d.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="'+esc(d.url)+'">📎 '+esc(d.name)+'</a>';
+      } else {
+        h += '<span class="doc-plain">📎 '+esc(d.name)+'</span>';
+      }
+    });
+    return h + '</div>';
+  }
+  window.addDocLink = function(){
+    var uEl = document.getElementById('f_docurl');
+    var nEl = document.getElementById('f_docname');
+    var ta = document.getElementById('f_docs');
+    if(!uEl || !ta) return;
+    var url = (uEl.value||'').trim();
+    if(!url) return;
+    if(!/^(https?:\/\/|data:)/i.test(url)) url = 'https://' + url;
+    var nm = (nEl && (nEl.value||'').trim()) || guessName(url);
+    var cur = ta.value.replace(/\s+$/, '');
+    ta.value = (cur ? cur + '\n' : '') + nm + ' | ' + url;
+    uEl.value = '';
+    if(nEl) nEl.value = '';
+    uEl.focus();
+  };
+  window.grabDocTitle = function(){
+    var uEl = document.getElementById('f_docurl');
+    var nEl = document.getElementById('f_docname');
+    var url = (uEl && (uEl.value||'').trim()) || '';
+    if(!url){ alert('请先粘贴链接'); return; }
+    if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    if(nEl) nEl.value = '获取中…';
+    fetch(url, {mode: 'cors'}).then(function(r){ return r.text(); }).then(function(t){
+      var m = t.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+      var title = m && m[1] ? m[1].replace(/\s+/g,' ').trim().slice(0,60) : '';
+      if(nEl) nEl.value = title || guessName(url);
+    }).catch(function(){
+      if(nEl) nEl.value = guessName(url);
+      alert('⚠️ 浏览器跳域限制，无法直接读取该网页标题。已用链接自动命名，可手动修改。');
+    });
+  };
+  function showTextFile(name, txt){
+    var kb = (txt.length / 1024).toFixed(1);
+    var h = '<div class="sop-head"><span class="sop-name">📄 '+esc(name)+'</span><span class="timepoint">'+kb+' KB</span></div>' +
+      '<pre style="white-space:pre-wrap;word-break:break-word;font-size:12.5px;line-height:1.75;color:#374151;font-family:inherit;margin:0;max-height:60vh;overflow:auto;">'+esc(txt)+'</pre>' +
+      '<div class="sop-actions"><button class="btn gray" onclick="closeModal()">关闭</button></div>';
+    document.getElementById('modalBtns').style.display = 'none';
+    openModal('📄 附件预览', h, null);
+  }
+  window.openDoc = function(el){
+    var url = el.getAttribute('data-url') || '';
+    var name = el.getAttribute('data-name') || '';
+    if(/^data:/i.test(url)){
+      try{
+        var b64 = url.split(',')[1] || '';
+        var txt = decodeURIComponent(escape(atob(b64)));
+        showTextFile(name, txt);
+      }catch(e){ alert('文件内容解析失败'); }
+    } else if(url){
+      window.open(url, '_blank', 'noopener');
+    }
+  };
+  window.pickTextFiles = function(){
+    var inp = document.getElementById('f_docfile');
+    if(!inp) return;
+    inp.value = '';
+    inp.onchange = function(){
+      var files = Array.prototype.slice.call(inp.files || []);
+      if(!files.length) return;
+      var ta = document.getElementById('f_docs');
+      if(!ta) return;
+      files.forEach(function(f){
+        if(f.size > 300 * 1024){ alert('⚠️ ' + f.name + ' 超过 300KB，建议改用链接（文本内嵌会占浏览器存储）'); return; }
+        var r = new FileReader();
+        r.onload = function(){
+          var txt = String(r.result || '');
+          var b64 = btoa(unescape(encodeURIComponent(txt)));
+          var line = f.name + ' | data:text/plain;base64,' + b64;
+          ta.value = (ta.value.replace(/\s+$/, '') ? ta.value.replace(/\s+$/, '') + '\n' : '') + line;
+        };
+        r.onerror = function(){ alert('读取失败：' + f.name); };
+        r.readAsText(f, 'utf-8');
+      });
+    };
+    inp.click();
+  };
+  function purposeText(d){ return (typeof d === 'string') ? d : ((d && d.text) || ''); }
+  function purposeImgs(d){ return (typeof d === 'string') ? [] : ((d && d.imgs) || []); }
+
+  window.showImg = function(src){
+    var w = window.open('', '_blank');
+    if(w){ w.document.write('<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>图片</title></head><body style="margin:0;background:#0f172a;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="'+src+'" style="max-width:96vw;max-height:96vh;border-radius:8px;"></body></html>'); w.document.close(); }
+  };
+  function imgsHTML(c){
+    /* 图片功能已停用：一律不渲染 */
+    return '';
+  }
+  function stripImgs(obj){
+    if(!obj || !obj.boards) return obj;
+    obj.boards.forEach(function(b){
+      (b.cards||[]).forEach(function(c){
+        if(c.purpose && typeof c.purpose === 'object'){ c.purpose = {text: (c.purpose.text || '')}; }
+      });
+    });
+    return obj;
+  }
+
+  window.setView = function(v){
+    currentView = v;
+    document.getElementById('view-cards').classList.toggle('hidden', v!=='cards');
+    document.getElementById('view-map').classList.toggle('hidden', v!=='map');
+    document.getElementById('tab-cards').classList.toggle('active', v==='cards');
+    document.getElementById('tab-map').classList.toggle('active', v==='map');
+  };
+
+  var dragSrc = null;
+  var justDragged = false;
+
+  function reorderCards(bi, from, to, after){
+    var arr = state.boards[bi].cards;
+    if(from === to || !arr[from]) return false;
+    var item = arr.splice(from, 1)[0];
+    var insertAt = (from < to) ? (to - 1 + (after ? 1 : 0)) : (to + (after ? 1 : 0));
+    if(insertAt < 0) insertAt = 0;
+    if(insertAt > arr.length) insertAt = arr.length;
+    arr.splice(insertAt, 0, item);
+    render();
+    return true;
+  }
+  function isAfterMid(e){
+    var rect = e.currentTarget.getBoundingClientRect();
+    return (e.clientY - rect.top) > rect.height / 2;
+  }
+  window.onDragStart = function(e, bi, ci){
+    dragSrc = {bi:bi, ci:ci};
+    justDragged = true;
+    if(e.dataTransfer){ e.dataTransfer.effectAllowed = 'move'; try{ e.dataTransfer.setData('text/plain', 'x'); }catch(x){} }
+    if(e.currentTarget && e.currentTarget.classList) e.currentTarget.classList.add('dragging');
+    e.stopPropagation();
+  };
+  window.onDragOver = function(e, bi, ci){
+    if(!dragSrc || dragSrc.bi !== bi) return;
+    e.preventDefault();
+    if(e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    if(e.currentTarget && e.currentTarget.classList) e.currentTarget.classList.add('drag-over');
+  };
+  window.onDragLeave = function(e){
+    if(e.currentTarget && e.currentTarget.classList) e.currentTarget.classList.remove('drag-over');
+  };
+  window.onDrop = function(e, bi, ci){
+    e.preventDefault(); e.stopPropagation();
+    if(e.currentTarget && e.currentTarget.classList) e.currentTarget.classList.remove('drag-over');
+    if(!dragSrc || dragSrc.bi !== bi || dragSrc.ci === ci) return;
+    reorderCards(bi, dragSrc.ci, ci, isAfterMid(e));
+    dragSrc = null;
+  };
+  window.onDragEnd = function(e){
+    if(e && e.currentTarget && e.currentTarget.classList) e.currentTarget.classList.remove('dragging');
+    dragSrc = null;
+    setTimeout(function(){ justDragged = false; }, 120);
+  };
+  window.onMapDrop = function(e, bi, ci){
+    e.preventDefault(); e.stopPropagation();
+    if(e.currentTarget && e.currentTarget.classList) e.currentTarget.classList.remove('drag-over');
+    if(!dragSrc || dragSrc.bi !== bi || dragSrc.ci === ci) return;
+    var arr = state.boards[bi].cards;
+    var a = arr[dragSrc.ci], b = arr[ci];
+    if(!a || !b || a.step !== b.step) return;
+    reorderCards(bi, dragSrc.ci, ci, isAfterMid(e));
+    dragSrc = null;
+  };
+
+  function renderChain(){
+    var el = document.getElementById('chain');
+    document.getElementById('chainCount').textContent = state.chain.length;
+    el.innerHTML = state.chain.map(function(s,i){
+      return '<span class="step s'+(i+1)+'"><span class="n">'+(i+1)+'</span>'+esc(s)+'</span>' + (i<state.chain.length-1?'<span class="arrow">→</span>':'');
+    }).join('');
+  }
+
+  function renderBoards(){
+    var wrap = document.getElementById('boards');
+    wrap.innerHTML = state.boards.map(function(b, bi){
+      var cards = b.cards.map(function(c, ci){
+        var stepCount = parseSteps(c.steps).length;
+        var probCount = parseProblems(c.problems).length;
+        return '<div class="card" draggable="true"' +
+          ' ondragstart="onDragStart(event,'+bi+','+ci+')" ondragover="onDragOver(event,'+bi+','+ci+')"' +
+          ' ondragleave="onDragLeave(event)" ondrop="onDrop(event,'+bi+','+ci+')" ondragend="onDragEnd(event)"' +
+          ' onclick="showSopDetail('+bi+','+ci+')">' +
+          '<div class="op">' +
+          '  <button class="btn small blue" onclick="event.stopPropagation();openCard('+bi+','+ci+')">✏️</button>' +
+          '  <button class="btn small red" onclick="event.stopPropagation();deleteCard('+bi+','+ci+')">🗑</button>' +
+          '</div>' +
+          '<div class="card-top"><span class="card-name">'+esc(c.work)+'</span></div>' +
+          (c.timepoint ? '<div class="sop-line">⏱ 动作时间点：'+esc(c.timepoint)+'</div>' : '') +
+          '<div class="card-desc">'+rich(purposeText(c.purpose))+'</div>' +
+          imgsHTML(c) +
+          '<div class="badge-row">' +
+          (stepCount ? '<span class="mini-badge">'+stepCount+' 步</span>' : '') +
+          (probCount ? '<span class="mini-badge warn">'+probCount+' 个常见问题</span>' : '') +
+          (c.standards ? '<span class="mini-badge">✅ 有检查点</span>' : '') +
+          '</div>' +
+          '<div class="card-meta">' +
+          (c.owner ? '<div><span class="k">🤝</span>负责人：'+esc(c.owner)+(c.partners?' ｜ 协作：'+esc(c.partners):'')+'</div>' : '') +
+          '</div>' + docsHTML(c) + '</div>';
+      }).join('');
+      cards += '<button class="add-card" onclick="addCard('+bi+')">＋ 添加 SOP</button>';
+      return '<div class="board">' +
+        '<div class="board-head">' +
+        '<span class="board-dot" style="background:'+(b.color||'#2563eb')+'"></span>' +
+        '<span class="board-title">'+esc(b.name)+'</span>' +
+        '<div class="board-tools">' +
+        '  <button class="btn small gray" onclick="event.stopPropagation();editBoard('+bi+')">✏️</button>' +
+        '  <button class="btn small red" onclick="event.stopPropagation();deleteBoard('+bi+')">🗑</button>' +
+        '</div></div>' +
+        '<div class="board-sub">'+esc(b.sub||'')+'</div>' +
+        cards + '</div>';
+    }).join('');
+  }
+
+  function renderTools(){
+    var el = document.getElementById('tools');
+    el.innerHTML = state.tools.map(function(t, i){
+      return '<span class="chip" onclick="editTool('+i+')" title="点击编辑">'+esc(t)+'</span>';
+    }).join('') + '<span class="chip add" onclick="addTool()">＋</span>';
+  }
+
+  function stepCards(){
+    var map = {};
+    for(var i=1;i<=state.chain.length;i++) map[i] = [];
+    map[0] = [];
+    state.boards.forEach(function(b, bi){
+      b.cards.forEach(function(c, ci){
+        var s = (c.step && map[c.step]) ? c.step : 0;
+        map[s].push({card:c, boardName:b.name, boardColor:b.color||'#2563eb', bi:bi, ci:ci});
+      });
+    });
+    return map;
+  }
+
+  function stepOptionsHtml(item){
+    var opts = ['<option value="0">未归类</option>'];
+    state.chain.forEach(function(s,i){ var v=i+1; opts.push('<option value="'+v+'"'+(item.card.step===v?' selected':'')+'>'+v+'. '+esc(s)+'</option>'); });
+    return '<select class="move-step" onchange="moveCard('+item.bi+','+item.ci+',this.value)">'+opts.join('')+'</select>';
+  }
+
+  function mapCardHtml(item, showMove){
+    var c = item.card;
+    return '<div class="map-card" draggable="true" style="border-left-color:'+item.boardColor+'"' +
+      ' ondragstart="onDragStart(event,'+item.bi+','+item.ci+')" ondragover="onDragOver(event,'+item.bi+','+item.ci+')"' +
+      ' ondragleave="onDragLeave(event)" ondrop="onMapDrop(event,'+item.bi+','+item.ci+')" ondragend="onDragEnd(event)"' +
+      ' onclick="showSopDetail('+item.bi+','+item.ci+')">' +
+      (showMove ? stepOptionsHtml(item) : '') +
+      '<div class="t"><span>'+esc(c.work)+'</span><span class="bd-tag" style="background:'+item.boardColor+'">'+esc(item.boardName)+'</span></div>' +
+      (c.timepoint ? '<div class="sop-line" style="margin:5px 0;">⏱ '+esc(c.timepoint)+'</div>' : '') +
+      '<div class="d">'+rich(purposeText(c.purpose))+'</div>' +
+      '<div class="m">' + (c.owner?'<div><span class="k">🤝</span>'+esc(c.owner)+'</div>':'') + '</div>' +
+      '</div>';
+  }
+
+  function renderMap(){
+    var body = document.getElementById('mapBody');
+    var map = stepCards();
+    var html = '';
+    state.chain.forEach(function(stepName, idx){
+      var stepNo = idx+1;
+      var color = STEP_COLORS[idx % STEP_COLORS.length];
+      var cards = map[stepNo] || [];
+      html += '<div class="map-step">' +
+        '<div class="map-node"><span class="dot" style="background:'+color+'">'+stepNo+'</span><b>'+esc(stepName)+'</b></div>' +
+        '<div class="map-branch">';
+      if(cards.length === 0){
+        html += '<div class="map-empty">（该步骤暂无 SOP，点「＋ 补充 SOP」添加）</div>';
+      } else {
+        cards.forEach(function(item){ html += mapCardHtml(item, true); });
+      }
+      html += '<button class="add-card" style="margin-left:0;" onclick="addCardByStep('+stepNo+')">＋ 补充 SOP</button>' +
+        '</div></div>';
+      if(idx < state.chain.length-1){ html += '<div class="arrow-down">↓</div>'; }
+    });
+    var uncat = map[0] || [];
+    if(uncat.length){
+      html += '<div class="map-step"><div class="map-node"><span class="dot" style="background:#94a3b8">?</span><b>未归类</b></div><div class="map-branch">';
+      uncat.forEach(function(item){ html += mapCardHtml(item, true); });
+      html += '</div></div>';
+    }
+    body.innerHTML = html;
+  }
+
+  window.moveCard = function(bi, ci, stepVal){
+    state.boards[bi].cards[ci].step = parseInt(stepVal,10) || 0;
+    render();
+  };
+  window.addCardByStep = function(stepNo){
+    openModal('＋ 新增 SOP（归入第'+stepNo+'步 · 选品板块）', cardFormHtml(null), {type:'cardNew', bi:0, forcedStep:stepNo});
+  };
+
+  function render(){ renderChain(); renderBoards(); renderTools(); renderMap(); save(); }
+
+  function has(v){ return String(v==null?'':v).trim() !== ''; }
+  window.showSopDetail = function(bi, ci){
+    if(justDragged) return;
+    var c = state.boards[bi].cards[ci];
+    var steps = parseSteps(c.steps), probs = parseProblems(c.problems);
+    var h = '<div class="sop-head"><span class="sop-name">'+esc(c.work)+'</span>' +
+      (has(c.timepoint) ? '<span class="timepoint">动作时间点：'+esc(c.timepoint)+'</span>' : '') + '</div>';
+
+    /* 1. 目的 */
+    if(has(purposeText(c.purpose)) || purposeImgs(c).length){
+      h += '<div class="sop-sec"><h4>1. 目的</h4><div class="hint">'+HINTS.purpose+'</div>' +
+        (has(purposeText(c.purpose)) ? '<div class="body">'+rich(purposeText(c.purpose))+'</div>' : '') +
+        '<div id="detailImgs">'+imgsHTML(c)+'</div></div>';
+    }
+
+    /* 2. 适用范围 */
+    var rows2 = [];
+    if(has(c.scope)) rows2.push('<div><b>适用场景：</b>'+rich(c.scope)+'</div>');
+    if(has(c.owner) || has(c.partners)){
+      var line2 = '';
+      if(has(c.owner)) line2 += '<b>负责人：</b>'+rich(c.owner);
+      if(has(c.partners)) line2 += (line2 ? '　' : '') + '<b>协作方：</b>'+rich(c.partners);
+      rows2.push('<div>'+line2+'</div>');
+    }
+    if(rows2.length){
+      h += '<div class="sop-sec"><h4>2. 适用范围</h4><div class="hint">'+HINTS.scope+'</div><div class="kv">'+rows2.join('')+'</div></div>';
+    }
+
+    /* 3. 输入 */
+    if(has(c.inputs)){
+      h += '<div class="sop-sec"><h4>3. 输入</h4><div class="hint">'+HINTS.inputs+'</div><div class="body">'+rich(c.inputs)+'</div></div>';
+    }
+
+    /* 附件 */
+    var dh = docsHTML(c);
+    if(dh){
+      h += '<div class="sop-sec"><h4>📎 相关文档</h4><div class="hint">'+HINTS.docs+'</div>' + dh + '</div>';
+    }
+
+    /* 4. 步骤 */
+    if(steps.length){
+      h += '<div class="sop-sec"><h4>4. 步骤</h4><div class="hint">'+HINTS.steps+'</div>';
+      h += '<table class="sop-tbl"><thead><tr><th>步骤</th><th>动作</th><th>工具/模板/文件</th></tr></thead><tbody>';
+      steps.forEach(function(s,i){ h += '<tr><td class="idx">'+(i+1)+'</td><td>'+rich(s.a)+'</td><td>'+rich(s.t||'—')+'</td></tr>'; });
+      h += '</tbody></table></div>';
+    }
+
+    /* 5. 输出 */
+    var rows5 = [];
+    if(has(c.deliverable)) rows5.push('<div><b>交付物：</b>'+rich(c.deliverable)+'</div>');
+    if(has(c.location) || has(c.handTo)){
+      var line5 = '';
+      if(has(c.location)) line5 += '<b>存放位置：</b>'+rich(c.location);
+      if(has(c.handTo)) line5 += (line5 ? '　' : '') + '<b>交给：</b>'+rich(c.handTo);
+      rows5.push('<div>'+line5+'</div>');
+    }
+    if(rows5.length){
+      h += '<div class="sop-sec"><h4>5. 输出</h4><div class="hint">'+HINTS.deliverable+'</div><div class="kv">'+rows5.join('')+'</div></div>';
+    }
+
+    /* 6. 标准 */
+    if(has(c.standards)){
+      h += '<div class="sop-sec"><h4>6. 标准与检查点</h4><div class="hint">'+HINTS.standards+'</div><div class="body">'+rich(c.standards)+'</div></div>';
+    }
+
+    /* 7. 常见问题 */
+    if(probs.length){
+      h += '<div class="sop-sec"><h4>7. 常见问题</h4><div class="hint">'+HINTS.problems+'</div>';
+      h += '<table class="sop-tbl"><thead><tr><th>问题</th><th>原因</th><th>处理方法</th></tr></thead><tbody>';
+      probs.forEach(function(p){ h += '<tr><td>'+rich(p.q)+'</td><td>'+rich(p.c||'—')+'</td><td>'+rich(p.f||'—')+'</td></tr>'; });
+      h += '</tbody></table></div>';
+    }
+
+    h += '<div class="sop-actions">' +
+      '<button class="btn gray" onclick="closeModal()">关闭</button>' +
+      '<button class="btn primary" onclick="openCard('+bi+','+ci+')">✏️ 编辑 SOP</button></div>';
+
+    document.getElementById('modalBtns').style.display = 'none';
+    openModal('📋 SOP 详情', h, null);
+  };
+
+  var modalCtx = null;
+  var modalEl, modalTitle, modalBody;
+
+  function imgListHtml(){
+    if(!pendingImgs.length) return '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">（暂无图片）</div>';
+    return '<div class="img-edit">' + pendingImgs.map(function(u, i){
+      return '<div class="img-edit-item"><img src="'+esc(u)+'"><button class="del" onclick="removePendingImg('+i+')">×</button></div>';
+    }).join('') + '</div>';
+  }
+
+  function cardFormHtml(c){
+    var v = function(k){ return c ? esc(c[k]||'') : ''; };
+    pendingImgs = c ? (purposeImgs(c.purpose)||[]).slice() : [];
+    return '<div class="fmt-bar">' +
+      '<span class="fl">格式：</span>' +
+      '<button type="button" data-o="**" data-c="**" onclick="applyFmtBtn(this)"><b>B</b> 加粗</button>' +
+      '<button type="button" data-o="__" data-c="__" onclick="applyFmtBtn(this)"><u>U</u> 下划线</button>' +
+      '<button type="button" data-o="[红]" data-c="[/红]" onclick="applyFmtBtn(this)" style="color:#dc2626">红</button>' +
+      '<button type="button" data-o="[蓝]" data-c="[/蓝]" onclick="applyFmtBtn(this)" style="color:#2563eb">蓝</button>' +
+      '<button type="button" data-o="[绿]" data-c="[/绿]" onclick="applyFmtBtn(this)" style="color:#16a34a">绿</button>' +
+      '<span class="fmt-hint">先选中文字再点；不选则自动插入示例</span>' +
+      '</div>' +
+      '<div class="field"><label>SOP 名称</label><input id="f_name" value="'+v('work')+'"></div>' +
+      '<div class="field"><label>动作时间点</label><div class="hint">'+HINTS.timepoint+'</div><input id="f_time" value="'+v('timepoint')+'"></div>' +
+      '<div class="field"><label>1. 目的</label><div class="hint">'+HINTS.purpose+'</div><textarea id="f_purpose">'+(c?esc(purposeText(c.purpose)):'')+'</textarea></div>' +
+      '<div class="field"><label>2. 适用范围 · 适用场景</label><div class="hint">'+HINTS.scope+'</div><input id="f_scope" value="'+v('scope')+'"></div>' +
+      '<div class="row2"><div class="field"><label>负责人</label><input id="f_owner" value="'+v('owner')+'"></div>' +
+      '<div class="field"><label>协作方</label><input id="f_partners" value="'+v('partners')+'"></div></div>' +
+      '<div class="field"><label>3. 输入</label><div class="hint">'+HINTS.inputs+'</div><textarea id="f_inputs">'+v('inputs')+'</textarea></div>' +
+      '<div class="field"><label>📎 相关文档（附件入口）</label><div class="hint">'+HINTS.docs+'</div>' +
+      '<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">' +
+      '<input id="f_docurl" placeholder="粘贴链接（https://…）" style="flex:1 1 190px; min-width:150px; border:1px solid #cbd5e1; border-radius:8px; padding:6px 9px; font-size:12.5px;">' +
+      '<input id="f_docname" placeholder="命名（可留空自动）" style="flex:1 1 130px; min-width:110px; border:1px solid #cbd5e1; border-radius:8px; padding:6px 9px; font-size:12.5px;">' +
+      '<button type="button" class="btn small blue" onclick="addDocLink()">＋ 添加链接</button>' +
+      '<button type="button" class="btn small gray" onclick="grabDocTitle()">🔍 取标题</button>' +
+      '</div>' +
+      '<textarea id="f_docs" style="min-height:60px;">'+v('docs')+'</textarea>' +
+      '<div style="display:flex; gap:8px; align-items:center; margin-top:6px;">' +
+      '<button type="button" class="btn small blue" onclick="pickTextFiles()">📄 上传文本文件</button>' +
+      '<span style="font-size:11px; color:#94a3b8;">支持 .md / .txt / .csv / .json，单个 ≤300KB</span>' +
+      '</div></div>' +
+      '<div class="field"><label>4. 步骤</label><div class="hint">'+HINTS.steps+'</div><textarea id="f_steps" style="min-height:92px;">'+v('steps')+'</textarea></div>' +
+      '<div class="field"><label>5. 输出 · 交付物</label><div class="hint">'+HINTS.deliverable+'</div><input id="f_deliverable" value="'+v('deliverable')+'"></div>' +
+      '<div class="row2"><div class="field"><label>存放位置</label><input id="f_location" value="'+v('location')+'"></div>' +
+      '<div class="field"><label>交给</label><input id="f_handTo" value="'+v('handTo')+'"></div></div>' +
+      '<div class="field"><label>6. 标准与检查点</label><div class="hint">'+HINTS.standards+'</div><textarea id="f_standards">'+v('standards')+'</textarea></div>' +
+      '<div class="field"><label>7. 常见问题</label><div class="hint">'+HINTS.problems+'</div><textarea id="f_problems" style="min-height:92px;">'+v('problems')+'</textarea></div>';
+  }
+
+  function openModal(title, html, ctx){
+    modalTitle.textContent = title;
+    modalBody.innerHTML = html;
+    modalCtx = ctx;
+    document.getElementById('modalBtns').style.display = (ctx ? 'flex' : 'none');
+    modalEl.classList.remove('hidden');
+  }
+  function closeModal(){ modalEl.classList.add('hidden'); modalCtx = null; pendingImgs = []; }
+  window.openModal = openModal; window.closeModal = closeModal;
+  function field(id){ return document.getElementById(id).value; }
+
+  var lastTextarea = null;
+  document.addEventListener('focusin', function(e){
+    if(e.target && e.target.tagName === 'TEXTAREA'){ lastTextarea = e.target; }
+  });
+  window.applyFmtBtn = function(btn){ window.applyFmt(btn.getAttribute('data-o'), btn.getAttribute('data-c')); };
+  window.applyFmt = function(open, close){
+    var el = lastTextarea;
+    if(!el || !document.body.contains(el)){ el = document.querySelector('#modalBody textarea'); }
+    if(!el) return;
+    var val = el.value;
+    var s = el.selectionStart || 0;
+    var e2 = el.selectionEnd || 0;
+    var sel = (e2 > s) ? val.slice(s, e2) : '文字';
+    el.value = val.slice(0, s) + open + sel + close + val.slice(e2);
+    el.focus();
+    el.selectionStart = s + open.length;
+    el.selectionEnd = s + open.length + sel.length;
+  };
+
+  window.pickImages = function(){
+    imgFileEl.value = '';
+    imgFileEl.onchange = function(){
+      var files = Array.prototype.slice.call(imgFileEl.files || []);
+      if(files.length === 0) return;
+      files.forEach(function(file){
+        compressImage(file, function(dataUrl){
+          pendingImgs.push(dataUrl);
+          document.getElementById('imgEditArea').innerHTML = imgListHtml();
+        });
+      });
+    };
+    imgFileEl.click();
+  };
+  window.addImgByUrl = function(url){
+    if(!url){ url = prompt('粘贴图片链接（http/https）：'); }
+    if(!url) return;
+    pendingImgs.push(url.trim());
+    document.getElementById('imgEditArea').innerHTML = imgListHtml();
+  };
+  window.removePendingImg = function(i){
+    pendingImgs.splice(i,1);
+    document.getElementById('imgEditArea').innerHTML = imgListHtml();
+  };
+  function compressImage(file, cb){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var MAX = 1800;
+        var scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        var w = Math.max(1, Math.round(img.width*scale)), h = Math.max(1, Math.round(img.height*scale));
+        var canvas = document.createElement('canvas'); canvas.width=w; canvas.height=h;
+        var ctx2 = canvas.getContext('2d');
+        ctx2.imageSmoothingEnabled = true; ctx2.imageSmoothingQuality = 'high';
+        ctx2.drawImage(img,0,0,w,h);
+        cb(canvas.toDataURL('image/jpeg', 0.88));
+      };
+      img.onerror = function(){ alert('⚠️ 图片读取失败：'+file.name); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function(){ alert('⚠️ 无法读取该文件'); };
+    reader.readAsDataURL(file);
+  }
+
+  window.openCard = function(bi, ci){
+    var c = state.boards[bi].cards[ci];
+    openModal('✏️ 编辑 SOP：'+c.work, cardFormHtml(c), {type:'card', bi:bi, ci:ci});
+  };
+  window.editBoard = function(bi){
+    var b = state.boards[bi];
+    openModal('✏️ 编辑板块：'+b.name,
+      '<div class="field"><label>板块名称</label><input id="f_name" value="'+esc(b.name)+'"></div>' +
+      '<div class="field"><label>副标题</label><input id="f_sub" value="'+esc(b.sub||'')+'"></div>' +
+      '<div class="field"><label>颜色</label><input id="f_color" type="color" value="'+(b.color||'#2563eb')+'"></div>',
+      {type:'board', bi:bi});
+  };
+  window.editChain = function(){
+    openModal('🔗 编辑主链路（用 → 分隔步骤）',
+      '<div class="field"><label>链路步骤</label><textarea id="f_chain">'+esc(state.chain.join(' → '))+'</textarea></div>',
+      {type:'chain'});
+  };
+  window.editTool = function(i){
+    openModal('🧰 编辑工具', '<div class="field"><label>工具名称</label><input id="f_tool" value="'+esc(state.tools[i])+'"></div>', {type:'tool', i:i});
+  };
+  window.addCard = function(bi){
+    openModal('＋ 新增 SOP 到「'+state.boards[bi].name+'」', cardFormHtml(null), {type:'cardNew', bi:bi});
+  };
+  window.addTool = function(){
+    openModal('＋ 添加工具', '<div class="field"><label>工具名称</label><input id="f_tool"></div>', {type:'toolNew'});
+  };
+
+  window.saveModal = function(){
+    if(!modalCtx) return;
+    var ctx = modalCtx;
+    if(ctx.type === 'card' || ctx.type === 'cardNew'){
+      var obj = {
+        work: field('f_name'), timepoint: field('f_time'),
+        purpose: {text: field('f_purpose')},
+        scope: field('f_scope'), owner: field('f_owner'), partners: field('f_partners'),
+        inputs: field('f_inputs'), steps: field('f_steps'), docs: field('f_docs'),
+        deliverable: field('f_deliverable'), location: field('f_location'), handTo: field('f_handTo'),
+        standards: field('f_standards'), problems: field('f_problems')
+      };
+      if(ctx.type === 'card'){
+        var c = state.boards[ctx.bi].cards[ctx.ci];
+        Object.keys(obj).forEach(function(k){ c[k] = obj[k]; });
+      } else {
+        obj.step = ctx.forcedStep || 0;
+        state.boards[ctx.bi].cards.push(obj);
+      }
+    } else if(ctx.type === 'board'){
+      var b = state.boards[ctx.bi];
+      b.name = field('f_name'); b.sub = field('f_sub'); b.color = field('f_color');
+    } else if(ctx.type === 'chain'){
+      state.chain = field('f_chain').split(/[→,，]/).map(function(s){return s.trim();}).filter(Boolean);
+    } else if(ctx.type === 'tool'){
+      state.tools[ctx.i] = field('f_tool');
+    } else if(ctx.type === 'toolNew'){
+      var t = field('f_tool'); if(t) state.tools.push(t);
+    }
+    closeModal(); render();
+  };
+
+  window.deleteCard = function(bi, ci){ if(confirm('删除 SOP「'+state.boards[bi].cards[ci].work+'」？')){ state.boards[bi].cards.splice(ci,1); render(); } };
+  window.deleteBoard = function(bi){ if(confirm('删除整个板块「'+state.boards[bi].name+'」？')){ state.boards.splice(bi,1); render(); } };
+
+  window.copyJSON = function(){
+    var txt = JSON.stringify(state, null, 2);
+    function done(){ alert('✅ 数据已复制！把这段 JSON 发给我，或自己粘到 index.html 的 initialData 里，即可永久保存。'); }
+    function fallback(t){ prompt('浏览器限制复制，请手动复制以下 JSON：', t); }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, function(){ fallback(txt); }); }
+    else { fallback(txt); }
+  };
+
+  /* ===== 云端同步 ===== */
+  function fmtTime(ts){
+    if(!ts) return '—';
+    var d = new Date(Number(ts));
+    function p(n){ return String(n).padStart(2,'0'); }
+    return (d.getMonth()+1) + '/' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function setSync(msg, cls){ var el = document.getElementById('syncStatus'); if(el){ el.textContent = msg; el.className = 'sync-status ' + (cls||''); } }
+  function b64enc(s){ return btoa(unescape(encodeURIComponent(s))); }
+  function b64dec(s){ return decodeURIComponent(escape(atob(String(s).replace(/\s/g,'')))); }
+  function sanitizeJSON(obj){
+    return JSON.stringify(obj).replace(/https:\/\/for-deal\.feishu\.cn\/[A-Za-z0-9\/_.\-]*/g, '（内部文档，见本地）');
+  }
+  function cloudRawUrl(){ return 'https://raw.githubusercontent.com/' + GH.owner + '/' + GH.repo + '/' + GH.branch + '/' + GH.path + '?t=' + Date.now(); }
+
+  window.setToken = function(){
+    var cur = localStorage.getItem(LS_TOKEN) || '';
+    var h = '<div class="sop-head"><span class="sop-name">🔑 设置 GitHub Token</span>' +
+      '<span class="timepoint">' + (cur ? '已保存' : '未设置') + '</span></div>' +
+      '<div class="sop-sec"><div class="body"><b>作用：</b>用右上角「☁️ 上传云端」把当前数据同步到 GitHub 仓库（' + GH.owner + '/' + GH.repo + '），手机/其他设备刷新就能看到。</div>' +
+      '<div class="body"><b>安全：</b>Token 只保存在这台设备的浏览器里，只对本仓库有写权限。</div></div>' +
+      '<div class="sop-sec"><h4>生成步骤（1 分钟）</h4><div class="body">1. 打开 github.com/settings/personal-access-tokens/new\n2. Token name 随便填（如 workflow-map-sync）\n3. Repository access → Only select repositories → 选 ' + GH.repo + '\n4. Permissions → Repository permissions → 找到 Contents → 设为 Read and write\n5. 点 Generate token，复制 github_pat_ 开头的字符串</div></div>' +
+      '<div class="field"><label>粘贴 Token</label><input id="f_token" type="password" placeholder="github_pat_..." value="' + esc(cur) + '"></div>' +
+      '<div class="sop-actions"><button class="btn gray" onclick="closeModal()">取消</button>' +
+      '<button class="btn red" onclick="clearToken()">清除 Token</button>' +
+      '<button class="btn primary" onclick="saveToken()">保存 Token</button></div>';
+    document.getElementById('modalBtns').style.display = 'none';
+    openModal('🔑 GitHub Token 设置', h, null);
+  };
+  window.saveToken = function(){
+    var t = (document.getElementById('f_token').value || '').trim();
+    if(!t){ alert('请先粘贴 Token'); return; }
+    localStorage.setItem(LS_TOKEN, t);
+    closeModal();
+    setSync('✅ Token 已保存 · 现在可以点右上角「☁️ 上传云端」同步数据', 'ok');
+  };
+  window.clearToken = function(){
+    localStorage.removeItem(LS_TOKEN);
+    closeModal();
+    setSync('已清除 Token（仍可拉取云端，但无法上传）', 'warn');
+  };
+
+  window.pullCloud = function(silent){
+    setSync('正在从云端拉取…');
+    fetch(cloudRawUrl(), {cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('云端暂无数据（HTTP ' + r.status + '）');
+      return r.json();
+    }).then(function(cloud){
+      if(!cloud || !cloud.boards) throw new Error('云端数据格式不对');
+      var cAt = Number(cloud.syncAt || 0);
+      var lSaved = Number(localStorage.getItem(LS_SAVED_AT) || 0);
+      var localRaw = localStorage.getItem(LS_KEY);
+
+      /* 本地没有任何数据（首次访问/换设备）→ 直接用云端 */
+      if(!localRaw){
+        state = stripImgs(cloud);
+        state.syncAt = cAt;
+        render();
+        try{ localStorage.setItem(LS_PUSHED_AT, String(cAt)); localStorage.setItem(LS_SAVED_AT, String(cAt)); }catch(e){}
+        setSync('✅ 已载入云端数据（' + fmtTime(cAt) + '）', 'ok');
+        return;
+      }
+
+      /* 本地有数据：不自动覆盖，只提示差异 */
+      if(cAt > lSaved){
+        if(silent){
+          setSync('⚠️ 云端有更新（' + fmtTime(cAt) + '，本地 ' + fmtTime(lSaved) + '）· 要同步点「🔄 拉取云端」（会先备份本机当前数据）', 'warn');
+        } else {
+          if(!confirm('云端数据（' + fmtTime(cAt) + '）比本机（' + fmtTime(lSaved) + '）新。\n\n是否用云端数据覆盖本机？\n（覆盖前会自动备份本机当前数据，可用「恢复备份」找回）')){
+            setSync('已取消，保留本机数据（云端 ' + fmtTime(cAt) + '）', 'warn');
+            return;
+          }
+          try{ localStorage.setItem('erwen-wf-backup', localRaw); localStorage.setItem('erwen-wf-backup-at', String(Date.now())); }catch(e){}
+          state = stripImgs(cloud);
+          state.syncAt = cAt;
+          render();
+          try{ localStorage.setItem(LS_PUSHED_AT, String(cAt)); localStorage.setItem(LS_SAVED_AT, String(cAt)); }catch(e){}
+          setSync('✅ 已用云端数据覆盖（原本机数据已备份）· 点「↩️ 恢复备份」可回退', 'ok');
+        }
+      } else if(lSaved > cAt){
+        setSync('⚠️ 本机比云端新（本机 ' + fmtTime(lSaved) + ' ／ 云端 ' + fmtTime(cAt) + '）—— 确认后点「☁️ 上传云端」', 'warn');
+      } else {
+        setSync('已是最新（本地/云端 ' + fmtTime(cAt) + '）', 'ok');
+      }
+    }).catch(function(e){
+      if(silent){
+        var hasToken = !!localStorage.getItem(LS_TOKEN);
+        setSync(hasToken ? '本地模式（云端连接失败）—— 可重试「🔄 拉取云端」' : '⚠️ 还没设置 Token：点右上角「🔑 Token」设置后，就能用「☁️ 上传云端」同步到手机', 'warn');
+      }
+      else setSync('❌ ' + (e.message || '拉取失败'), 'err');
+    });
+  };
+
+  window.restoreBackup = function(){
+    var snaps = [
+      { key:'erwen-wf-backup', atKey:'erwen-wf-backup-at', label:'覆盖前备份' },
+      { key:'erwen-wf-snap', atKey:'erwen-wf-snap-at', label:'上一次修改前快照' }
+    ].filter(function(s){ return !!localStorage.getItem(s.key); });
+    if(!snaps.length){ alert('没有可恢复的备份/快照。'); return; }
+    var msg = '可恢复的版本：\n' + snaps.map(function(s,i){
+      return (i+1) + '. ' + s.label + '（' + fmtTime(Number(localStorage.getItem(s.atKey)||0)) + '）';
+    }).join('\n') + '\n\n输入序号恢复对应版本（当前数据会被替换）。';
+    var pick = prompt(msg, '1');
+    if(pick === null) return;
+    var idx = parseInt(pick, 10) - 1;
+    if(!(idx >= 0 && idx < snaps.length)){ alert('序号无效'); return; }
+    var s = snaps[idx];
+    try{
+      state = stripImgs(JSON.parse(localStorage.getItem(s.key)));
+      render();
+      setSync('✅ 已恢复：' + s.label + '（' + fmtTime(Number(localStorage.getItem(s.atKey)||0)) + '）', 'ok');
+    }catch(e){ alert('恢复失败：数据解析出错'); }
+  };
+
+  window.pushCloud = function(){
+    var token = localStorage.getItem(LS_TOKEN) || '';
+    if(!token){
+      alert('还没有设置 GitHub Token。\n\n操作顺序：\n1. 点右上角「🔑 Token」→ 粘贴 Token → 保存\n2. 再点这个「☁️ 上传云端」按钮\n\n（Token 生成方式在 Token 弹窗里有逐步说明）');
+      return;
+    }
+    setSync('正在上传到云端…');
+    var syncAt = Date.now();
+    var payloadObj = JSON.parse(sanitizeJSON(state));
+    payloadObj.syncAt = syncAt;
+    var content = b64enc(JSON.stringify(payloadObj));
+    var api = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo + '/contents/' + GH.path;
+    var headers = { 'Authorization':'Bearer ' + token, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' };
+    fetch(api + '?ref=' + GH.branch + '&t=' + syncAt, {headers:headers}).then(function(r){
+      if(r.ok) return r.json();
+      if(r.status === 404) return null;
+      if(r.status === 401 || r.status === 403) throw new Error('Token 无效或无权限（' + r.status + '）');
+      throw new Error('读取云端失败 ' + r.status);
+    }).then(function(exist){
+      var body = { message: '更新工作流数据 ' + fmtTime(syncAt), content: content, branch: GH.branch };
+      if(exist && exist.sha) body.sha = exist.sha;
+      return fetch(api, { method:'PUT', headers:headers, body: JSON.stringify(body) });
+    }).then(function(r){
+      if(!r.ok) return r.text().then(function(t){ throw new Error('上传失败 ' + r.status + '：' + String(t).slice(0,120)); });
+      state.syncAt = syncAt;
+      try{ localStorage.setItem(LS_PUSHED_AT, String(syncAt)); localStorage.setItem(LS_SAVED_AT, String(syncAt)); }catch(e){}
+      save();
+      setSync('✅ 已上传云端（' + fmtTime(syncAt) + '）· 手机/其他设备刷新即同步', 'ok');
+    }).catch(function(e){
+      setSync('❌ ' + (e.message || '上传失败'), 'err');
+    });
+  };
+  window.downloadData = function(){
+    var blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '工作流SOP数据.json';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  window.toggleData = function(){
+    var p = document.getElementById('dataPanel');
+    p.classList.toggle('hidden');
+    if(!p.classList.contains('hidden')){ document.getElementById('dataEditor').value = JSON.stringify(state, null, 2); }
+  };
+  window.applyData = function(){
+    try{
+      var p = JSON.parse(document.getElementById('dataEditor').value);
+      if(!p.boards || !p.chain) throw new Error('缺少 boards/chain');
+      state = p; closeModal(); render(); alert('✅ 已应用新数据');
+    }catch(e){ alert('❌ JSON 格式错误：'+e.message); }
+  };
+  window.resetData = function(){
+    if(!confirm('恢复默认数据？当前编辑内容会丢失（建议先「📋 复制数据」备份）。')) return;
+    try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    state = JSON.parse(JSON.stringify(DEFAULT));
+    render();
+  };
+
+  modalEl = document.getElementById('modal');
+  modalTitle = document.getElementById('modalTitle');
+  modalBody = document.getElementById('modalBody');
+  state = load();
+  lastPayload = JSON.stringify(state);
+  render();
+  bootDone = true;
+  pullCloud(true);
+})();
+</script>
+</body>
+</html>
